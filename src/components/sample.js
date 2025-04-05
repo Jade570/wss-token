@@ -7,18 +7,19 @@ import * as THREE from "three";
 import { io } from "socket.io-client";
 
 import vertexShader from "../shaders/sample.vert";
-import fragmentShader1 from "../shaders/sample.frag";
-import fragmentShader2 from "../shaders/sample2.frag";
+import fragmentShader3 from "../shaders/sample3.frag";
 
-// Tone.js: 간단한 Tone 재생 함수 (짧은 소리)
-const playTone = (freq) => {
-  Tone.start();
-  const synth = new Tone.Synth().toDestination();
-  synth.triggerAttackRelease(freq, "8n");
+// 색상 정보 객체 (hue 값)
+const colors = {
+  osong: 110,
+  sewol: 60,
+  stella: 32,
+  itaewon: 265,
+  aricell: 194,
 };
 
-// Star 컴포넌트: path와 선택된 fragment shader를 prop으로 받아 적용합니다.
-function Star({ path, fragShader }) {
+// Star 컴포넌트: path와 선택된 hue 값을 prop으로 받아 적용합니다.
+function Star({ path, hue }) {
   const gltf = useGLTF(path);
   const { camera } = useThree();
 
@@ -27,7 +28,7 @@ function Star({ path, fragShader }) {
       if (child.isMesh) {
         child.material = new THREE.ShaderMaterial({
           vertexShader,
-          fragmentShader: fragShader,
+          fragmentShader: fragmentShader3,
           uniforms: {
             u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
             u_time: { value: 0 },
@@ -36,11 +37,12 @@ function Star({ path, fragShader }) {
             u_directionalLightColor: { value: new THREE.Color(1, 1, 1) },
             u_directionalLightDirection: { value: new THREE.Vector3(5, 5, 5).normalize() },
             u_cameraPosition: { value: camera.position.clone() },
+            u_color: { value: hue },
           },
         });
       }
     });
-  }, [gltf, fragShader, camera]);
+  }, [gltf, camera, hue]);
 
   useFrame(({ clock }) => {
     gltf.scene.traverse((child) => {
@@ -63,12 +65,10 @@ export default function Scene() {
   // 모델 배열: planet, star, heart
   const models = ["/planet.glb", "/star.glb", "/heart.glb"];
   const [modelIndex, setModelIndex] = useState(0);
-  // shader 배열: 두 가지 fragment shader 옵션
-  const shaders = [fragmentShader1, fragmentShader2];
-  const [shaderIndex, setShaderIndex] = useState(0);
-  // 모델별 재생 주파수 (Planet: 440Hz, Star: 550Hz, Heart: 660Hz)
+  // 선택된 색상 키 (colors 객체의 key)
+  const [colorKey, setColorKey] = useState("aricell");
 
-  // Socket.IO 클라이언트 연결 (서버 주소를 실제 도메인 또는 IP와 포트로 변경)
+  // Socket.IO 클라이언트 연결
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -83,7 +83,6 @@ export default function Scene() {
     socket.on("disconnect", () => {
       console.log("웹소켓 연결 종료");
     });
-    // 서버에서 broadcast한 이벤트를 수신 (필요 시 처리)
     socket.on("playerModel", (data) => {
       console.log("서버에서 playerModel 업데이트:", data);
     });
@@ -95,7 +94,7 @@ export default function Scene() {
     };
   }, []);
 
-  // 모델 선택: 모델 인덱스 변경, Tone 재생, 그리고 서버에 update 전송
+  // 모델 선택 함수
   const handleModelChange = (index) => {
     setModelIndex(index);
     if (socketRef.current) {
@@ -103,12 +102,18 @@ export default function Scene() {
     }
   };
 
-  // Shader 선택: shader 인덱스 변경 및 서버에 update 전송
-  const handleShaderChange = (index) => {
-    setShaderIndex(index);
+  // 색상 선택 함수 (colors 객체의 key 사용)
+  const handleColorChange = (key) => {
+    setColorKey(key);
     if (socketRef.current) {
-      socketRef.current.emit("shaderUpdate", { id: socketRef.current.id, shader: index });
+      socketRef.current.emit("colorUpdate", { id: socketRef.current.id, color: key });
     }
+  };
+
+  // "enter!" 버튼 클릭 시 실행할 함수 (필요에 따라 수정)
+  const handleEnterClick = () => {
+    console.log("enter! 버튼 클릭");
+    // 추가 동작 구현 가능
   };
 
   return (
@@ -134,7 +139,7 @@ export default function Scene() {
           Heart
         </button>
       </div>
-      {/* Shader 선택 버튼 */}
+      {/* 색상 선택 버튼 (버튼 내부 텍스트 없음, 버튼 배경색은 H, S, B 값 적용) */}
       <div
         style={{
           position: "absolute",
@@ -145,22 +150,53 @@ export default function Scene() {
           gap: "10px",
         }}
       >
-        <button onClick={() => handleShaderChange(0)} style={{ padding: "10px 20px" }}>
-          Shader1
-        </button>
-        <button onClick={() => handleShaderChange(1)} style={{ padding: "10px 20px" }}>
-          Shader2
+        {Object.keys(colors).map((key) => (
+          <button
+            key={key}
+            onClick={() => handleColorChange(key)}
+            style={{
+              width: "40px",
+              height: "40px",
+              backgroundColor: `hsl(${colors[key]}, 100%, 50%)`,
+              border: "none",
+              borderRadius: "4px",
+            }}
+          />
+        ))}
+      </div>
+      {/* 뷰포트 하단 중앙의 "enter!" 텍스트 버튼 */}
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 2,
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
+        <button
+          onClick={handleEnterClick}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            border: "none",
+            borderRadius: "4px",
+            backgroundColor: "#777",
+            cursor: "pointer",
+          }}
+        >
+          Enter!
         </button>
       </div>
       <Canvas
         style={{ width: "100vw", height: "100vh", background: "transparent" }}
-        camera={{ position: [0, 0, 20], fov: 45 }}
+        camera={{ position: [0, 0, 25], fov: 45 }}
       >
         <OrbitControls />
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <group position={[0, 2, 0]}>
-          <Star path={models[modelIndex]} fragShader={shaders[shaderIndex]} />
+          <Star path={models[modelIndex]} hue={colors[colorKey]} />
         </group>
         <group position={[0, -3, 0]}>
           <Stick />

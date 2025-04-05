@@ -33,6 +33,7 @@ var options = {
       console.log(players);
       socket.emit("playerData", { id, players });
       socket.broadcast.emit("playerJoined", newPlayer);
+      socket.broadcast.emit("players", players);
     }
   
     socket.on("modelUpdate", function (data) {
@@ -41,7 +42,7 @@ var options = {
         return;
       }
       players[data.id].updateModel(data.model);
-      socket.broadcast.emit("playerModel", data);
+      socket.broadcast.emit("players", players);
     });
   
     socket.on("shaderUpdate", function (data) {
@@ -51,13 +52,14 @@ var options = {
       }
       players[data.id].updateShader(data.shader);
       console.log(players[data.id]);
-      socket.broadcast.emit("playerShader", players[data.id]);
+      socket.broadcast.emit("players", players);
     });
   
     socket.on("disconnect", function () {
       socket.broadcast.emit("killPlayer", socket.id);
       delete players[socket.id];
       console.log(socket.id, " cleaned up");
+      socket.broadcast.emit("players", players);
     });
   });
   
