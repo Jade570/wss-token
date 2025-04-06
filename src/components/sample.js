@@ -99,7 +99,7 @@ export default function Scene() {
       socket.emit("enteredUpdate", { id: socket.id, entered: 1 });
     }
     // 선택된 색상 키에 따라 라우터 이동 (예: "/stella", "/sewol", ...)
-    router.push(`/${colorKey}`);
+    router.push(`/tragedies/${colorKey}`);
   };
 
   return (
