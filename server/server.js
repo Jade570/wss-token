@@ -11,6 +11,11 @@ class Player {
     this.color = "queer"; // 색상 key 값으로 저장
     this.entered = 0;
     this.entity = null;
+
+    // 랜덤 위치 할당 (예: x: -10 ~ 10, y: -10 ~ 10)
+    this.x = Math.random() * 30 - 15;
+    this.y = Math.random() * 20 - 10;
+    this.z = Math.random() * 20 - 10;
   }
 
   updateModel(model) {
@@ -21,7 +26,7 @@ class Player {
     this.color = color;
   }
 
-  updateEntered(entered){
+  updateEntered(entered) {
     this.entered = entered;
   }
 }
@@ -40,6 +45,11 @@ io.sockets.on("connection", function (socket) {
     socket.broadcast.emit("playerJoined", newPlayer);
     socket.broadcast.emit("players", players);
   }
+
+  // 클라이언트가 "getPlayers"를 요청하면 해당 클라이언트에게만 players 데이터 전송
+  socket.on("getPlayers", function () {
+    socket.emit("players", players);
+  });
 
   socket.on("modelUpdate", function (data) {
     if (!players[data.id]) {
