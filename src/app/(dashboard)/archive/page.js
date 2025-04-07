@@ -7,7 +7,7 @@ export default function TragediesPage() {
     <div
       style={{
         padding: "40px",
-        textAlign: "center",
+        textAlign: "start",
       }}
     >
       <h1>Where Does Melancholy Come From, and Where Is It Heading?</h1>
