@@ -13,7 +13,7 @@ import fragmentShader3 from "../shaders/sample3.frag";
 // 색상 정보 객체 (hue 값)
 const colors = {
   queer: 0,
-  stella: 32,
+  stellar: 32,
   sewol: 60,
   osong: 110,
   aricell: 194,
@@ -98,8 +98,10 @@ export default function Scene() {
       socket.emit("colorUpdate", { id: socket.id, color: colorKey });
       socket.emit("enteredUpdate", { id: socket.id, entered: 1 });
     }
-    // 선택된 색상 키에 따라 라우터 이동 (예: "/stella", "/sewol", ...)
-    router.push(`/tragedies/${colorKey}`);
+    // 선택된 색상 키와 함께 id, model 값을 쿼리 파라미터로 전달
+    router.push(
+      `/archive/${colorKey}`
+    );
   };
 
   return (
