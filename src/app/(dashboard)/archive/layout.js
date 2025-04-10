@@ -21,7 +21,7 @@ export default function TragediesLayout({ children }) {
   const router = useRouter();
 
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div style={{ display: "flex", height: "100vh" , background: "#fff"}}>
       {/* 왼쪽 Navbar 영역 - toggle일 때 width가 100vw로 확장 */}
       <div
         style={{
@@ -54,7 +54,7 @@ export default function TragediesLayout({ children }) {
                   width: pathname === "/archive" ? "35px" : "30px",
                   height: pathname === "/archive" ? "60px" : "50px",
                   marginLeft: "auto",
-                  backgroundColor: pathname === "/archive" ? "#fff" : "#f0f0f0",
+                  backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
                   borderTop: pathname === "/archive" ? "2px solid white" : "none",
                   borderLeft: pathname === "/archive" ? "2px solid white" : "none",
                   borderBottom: pathname === "/archive" ? "2px solid white" : "none",

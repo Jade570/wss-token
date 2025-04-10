@@ -12,6 +12,7 @@
     "@p5-wrapper/react": "^4.4.2",
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.17.14",
+    "bufferutil": "^4.0.9",
     "framer-motion": "^11.18.1",
     "next": "13.4.12",
     "p5": "^1.11.3",
@@ -21,7 +22,8 @@
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.14",
     "three": "^0.173.0",
-    "tone": "^15.0.4"
+    "tone": "^15.0.4",
+    "utf-8-validate": "^6.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
