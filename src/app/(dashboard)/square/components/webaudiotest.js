@@ -31,12 +31,12 @@ function getChordFrequencies(chordElement) {
 // };
 
 const soundFiles = {
-  aricell: ["20240214-creative-response4.wav"],
-  itaewon: ["minseo_yongsanstation.wav"],
-  osong: ["jiwon_eulsukdo.wav"],
-  queer: ["soojeong_103.wav"],
-  sewol: ["eunji_study.wav"],
-  stellar: ["me_ktx_to_seoul.wav"],
+  aricell: ["20240214-creative-response4.mp3"],
+  itaewon: ["minseo_yongsanstation.mp3"],
+  osong: ["jiwon_eulsukdo.mp3"],
+  queer: ["soojeong_103.mp3"],
+  sewol: ["eunji_study.mp3"],
+  stellar: ["me_ktx_to_seoul.mp3"],
 };
 
 
