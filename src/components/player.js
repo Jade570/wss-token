@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
-import chordFrequencies from "./chordFrequencies";
-import chordProgression from "./chordProgressions";
+import chordFrequencies from "../app/(dashboard)/square/components/chordFrequencies";
+import chordProgression from "../app/(dashboard)/square/components/chordProgressions";
 
 // filter의 Q값에 따라 gain 변경 함수
 const calculateGain = (Q) => {
