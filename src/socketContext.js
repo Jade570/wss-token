@@ -12,10 +12,6 @@ export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // const socketInstance = io("http://45.32.211.174", {
-    //   path: "/socket.io",
-    //   transports: ["websocket"],
-    // });
     const socketInstance = io("wss://wssserver.chaeryeongoh.com/", {
       path: "/socket.io",
       transports: ["websocket"],
