@@ -61,7 +61,7 @@ const NativeAudioPlayerWithChordProgression = (props) => {
   const measureIndexRef = useRef(0);
   const autoMakeupIntervalRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [qValue, setQValue] = useState(0.5); // 초기 Q값 30
+  const [qValue, setQValue] = useState(1); // 초기 Q값 30
   const qValueRef = useRef(qValue);
 
   // 볼륨 상태 (0 ~ 1 사이, 초기값 1)
@@ -89,7 +89,7 @@ const NativeAudioPlayerWithChordProgression = (props) => {
       console.log("Entered count:", enteredCount);
       // Q 값을 enteredCount에 비례해서 결정합니다.
       // 예를 들어, 기본 Q 값 30에 enteredCount 당 5씩 증가한다고 가정하면:
-      const newQ = 0.5 + enteredCount * 5;
+      const newQ = 1 + enteredCount * 10;
       setQValue(newQ);
     };
 
