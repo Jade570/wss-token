@@ -23,6 +23,9 @@ function getChordFrequencies(chordElement) {
 const NativeAudioPlayerWithChordProgression = (props) => {
   const { socket } = props;
 
+  // 자동 재생을 위해 컴포넌트 마운트 시 playAudio()를 호출할 수 있음.
+  // (브라우저의 자동 재생 제한에 주의하십시오.)
+
   // 0.01 → 100 의 범위를 log10 스케일(-2 → 2)로 변환
   const minExp = Math.log10(0.01); // -2
   const maxExp = Math.log10(100); //  2
@@ -32,20 +35,23 @@ const NativeAudioPlayerWithChordProgression = (props) => {
   const sourceRef = useRef(null);
   const filterRefs = useRef([]); // 4개의 밴드패스 필터
   const autoMakeupGainRef = useRef(null);
+  const volumeGainRef = useRef(null); // 볼륨 컨트롤 노드
   const timeoutsRef = useRef([]); // 스케줄링 타이머 ID 저장
   const measureIndexRef = useRef(0);
   const autoMakeupIntervalRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [qValue, setQValue] = useState(30); // 초기 Q값 30
+  const [qValue, setQValue] = useState(0); // 초기 Q값 30
   const qValueRef = useRef(qValue);
-
+  
+  // 볼륨 상태 (0 ~ 1 사이, 초기값 1)
+  const [volume, setVolume] = useState(1);
 
   // chordProgression 선택 상태 (default: marching_new)
   const [selectedProgression, setSelectedProgression] =
     useState("marching_new");
   const selectedProgressionRef = useRef("marching_new");
 
-  // Socket.IO 클라이언트 연결 (서버 주소를 실제 도메인 또는 IP와 포트로 변경)
+  // Socket.IO 클라이언트 연결 (필요 시 사용)
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -60,16 +66,15 @@ const NativeAudioPlayerWithChordProgression = (props) => {
       console.log("Entered count:", enteredCount);
       // Q 값을 enteredCount에 비례해서 결정합니다.
       // 예를 들어, 기본 Q 값 30에 enteredCount 당 5씩 증가한다고 가정하면:
-      const newQ = 30 + enteredCount * 5;
+      const newQ = enteredCount * 5;
       setQValue(newQ);
     };
-  
+
     socket.on("players", handlePlayersForQ);
     return () => {
       socket.off("players", handlePlayersForQ);
     };
   }, [socket]);
-  
 
   // BPM 및 마디 관련 상수
   const BPM = 90;
@@ -89,7 +94,7 @@ const NativeAudioPlayerWithChordProgression = (props) => {
       }
 
       // /sample.m4a 파일 불러오기 및 디코딩
-      const response = await fetch("sounds/"+"kang_dinner.wav");
+      const response = await fetch("sounds/" + "jiwon_eulsukdo.wav");
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
@@ -119,19 +124,25 @@ const NativeAudioPlayerWithChordProgression = (props) => {
       autoMakeupGain.gain.value = baseGain;
       autoMakeupGainRef.current = autoMakeupGain;
 
+      // 볼륨 컨트롤을 위한 Gain 노드 생성 및 초기 값 설정
+      const volumeGain = audioContext.createGain();
+      volumeGain.gain.value = volume;
+      volumeGainRef.current = volumeGain;
+
       // Analyser 노드 생성 (compressor 출력 RMS 측정을 위해)
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 256;
       const dataArray = new Float32Array(analyser.fftSize);
 
-      // 오디오 체인 구성: source → 각 filter → compressor → autoMakeupGain → destination
+      // 오디오 체인 구성: source → 각 filter → compressor → autoMakeupGain → volumeGain → destination
       // compressor의 출력은 analyser에도 연결하여 RMS 측정
       filters.forEach((filter) => {
         source.connect(filter);
         filter.connect(compressor);
       });
       compressor.connect(autoMakeupGain);
-      autoMakeupGain.connect(audioContext.destination);
+      autoMakeupGain.connect(volumeGain);
+      volumeGain.connect(audioContext.destination);
       compressor.connect(analyser);
 
       // 재생 시작
@@ -157,17 +168,6 @@ const NativeAudioPlayerWithChordProgression = (props) => {
         autoMakeupGain.gain.exponentialRampToValueAtTime(
           finalGain,
           audioContext.currentTime + 0.1
-        );
-
-        console.log(
-          "RMS:",
-          rms.toFixed(3),
-          "makeupFactor:",
-          makeupFactor.toFixed(3),
-          "baseGain:",
-          baseGainNow.toFixed(3),
-          "finalGain:",
-          finalGain.toFixed(3)
         );
       };
 
@@ -274,44 +274,69 @@ const NativeAudioPlayerWithChordProgression = (props) => {
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
+    // 컴포넌트가 마운트되면 자동 재생 시도 (브라우저 자동 재생 제한에 주의)
+    playAudio();
     return () => {
       stopAudio();
     };
   }, []);
 
+  // 볼륨 슬라이더 변경 이벤트 핸들러
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    // 볼륨 노드가 이미 생성되었다면 바로 업데이트
+    if (volumeGainRef.current) {
+      volumeGainRef.current.gain.value = newVolume;
+    }
+  };
+
   return (
-    <div style={{ padding: "1em", background: "#e0e0e0" }}>
-      <h2>Chord Progression 적용 Native Web Audio API Player</h2>
-      <button
-        onClick={playAudio}
-        disabled={isPlaying}
-        style={{ marginRight: "1em" }}
-      >
-        재생
-      </button>
-      <button onClick={stopAudio} disabled={!isPlaying}>
-        정지
-      </button>
-      <div style={{ marginTop: "1em" }}>
+    <div style={{ padding: "1em", background: "transparent" }}>
+      <div style={{ marginBottom: "1em" }}>
+        {/* <button
+          onClick={playAudio}
+          disabled={isPlaying}
+          style={{ marginRight: "1em" }}
+        >
+          재생
+        </button>
+        <button onClick={stopAudio} disabled={!isPlaying}>
+          정지
+        </button> */}
+      </div>
+      <div style={{ marginBottom: "1em" }}>
         <span>현재 Progression: {selectedProgression}</span>
         <div style={{ marginTop: "0.5em" }}>
-  {Object.keys(chordProgression).map((key) => (
-    <button
-      key={key}
-      style={{ marginRight: "0.5em" }}
-      onClick={() => {
-        setSelectedProgression(key);
-        selectedProgressionRef.current = key;
-      }}
-    >
-      {key}
-    </button>
-  ))}
-</div>
+          {Object.keys(chordProgression).map((key) => (
+            <button
+              key={key}
+              style={{ marginRight: "0.5em" }}
+              onClick={() => {
+                setSelectedProgression(key);
+                selectedProgressionRef.current = key;
+              }}
+            >
+              {key}
+            </button>
+          ))}
+        </div>
       </div>
       <p>
         BPM: {BPM} / 한 마디 지속시간: {measureDuration.toFixed(2)}초
       </p>
+      <div>
+        <label htmlFor="volumeSlider">볼륨: </label>
+        <input
+          id="volumeSlider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={handleVolumeChange}
+        />
+      </div>
     </div>
   );
 };
