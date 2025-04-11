@@ -42,7 +42,7 @@ const NativeAudioPlayerWithChordProgression = (props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [qValue, setQValue] = useState(0); // 초기 Q값 30
   const qValueRef = useRef(qValue);
-  
+
   // 볼륨 상태 (0 ~ 1 사이, 초기값 1)
   const [volume, setVolume] = useState(1);
 
@@ -62,7 +62,9 @@ const NativeAudioPlayerWithChordProgression = (props) => {
     if (!socket) return;
     const handlePlayersForQ = (data) => {
       // data는 players 객체로 전달됩니다.
-      const enteredCount = Object.values(data).filter((player) => player.entered === 1).length;
+      const enteredCount = Object.values(data).filter(
+        (player) => player.entered === 1
+      ).length;
       console.log("Entered count:", enteredCount);
       // Q 값을 enteredCount에 비례해서 결정합니다.
       // 예를 들어, 기본 Q 값 30에 enteredCount 당 5씩 증가한다고 가정하면:
@@ -292,41 +294,16 @@ const NativeAudioPlayerWithChordProgression = (props) => {
   };
 
   return (
-    <div style={{ padding: "1em", background: "transparent" }}>
-      <div style={{ marginBottom: "1em" }}>
-        {/* <button
-          onClick={playAudio}
-          disabled={isPlaying}
-          style={{ marginRight: "1em" }}
-        >
-          재생
-        </button>
-        <button onClick={stopAudio} disabled={!isPlaying}>
-          정지
-        </button> */}
-      </div>
-      <div style={{ marginBottom: "1em" }}>
-        <span>현재 Progression: {selectedProgression}</span>
-        <div style={{ marginTop: "0.5em" }}>
-          {Object.keys(chordProgression).map((key) => (
-            <button
-              key={key}
-              style={{ marginRight: "0.5em" }}
-              onClick={() => {
-                setSelectedProgression(key);
-                selectedProgressionRef.current = key;
-              }}
-            >
-              {key}
-            </button>
-          ))}
-        </div>
-      </div>
-      <p>
-        BPM: {BPM} / 한 마디 지속시간: {measureDuration.toFixed(2)}초
-      </p>
+    <div
+      style={{
+        position: "fixed",
+        top: "20px",
+        left: "20px",
+        zIndex: 1000,
+      }}
+    >
       <div>
-        <label htmlFor="volumeSlider">볼륨: </label>
+        <label htmlFor="volumeSlider"></label>
         <input
           id="volumeSlider"
           type="range"
