@@ -21,13 +21,22 @@ function getChordFrequencies(chordElement) {
 }
 
 // 예시: 각 폴더 내에 존재하는 파일명 배열 (실제 파일명으로 수정)
+// const soundFiles = {
+//   aricell: ["20240214-creative-response4.wav", "joo_usarmy.wav"],
+//   itaewon: ["minseo_yongsanstation.wav", "myungjin_sogang.wav"],
+//   osong: ["jiwon_eulsukdo.wav", "woojin_planeandbird.wav"],
+//   queer: ["joo_crazybirds.wav", "soojeong_103.wav"],
+//   sewol: ["eunji_study.wav", "jiwon_myungdong.wav"],
+//   stellar: ["me_ktx_to_seoul.wav", "zero_midnight_lab_alone.wav"],
+// };
+
 const soundFiles = {
-  aricell: ["20240214-creative-response4.wav", "joo_usarmy.wav"],
-  itaewon: ["minseo_yongsanstation.wav", "myungjin_sogang.wav"],
-  osong: ["jiwon_eulsukdo.wav", "woojin_planeandbird.wav"],
-  queer: ["joo_crazybirds.wav", "soojeong_103.wav"],
-  sewol: ["eunji_study.wav", "jiwon_myungdong.wav"],
-  stellar: ["me_ktx_to_seoul.wav", "zero_midnight_lab_alone.wav"],
+  aricell: ["20240214-creative-response4.wav"],
+  itaewon: ["minseo_yongsanstation.wav"],
+  osong: ["jiwon_eulsukdo.wav"],
+  queer: ["soojeong_103.wav"],
+  sewol: ["eunji_study.wav"],
+  stellar: ["me_ktx_to_seoul.wav"],
 };
 
 
