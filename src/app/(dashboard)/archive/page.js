@@ -16,11 +16,22 @@ export default function TragediesPage() {
         style={{
           fontStyle: "italic",
           color: "#333",
-          paddingBottom: "40px"
+          paddingBottom: "40px",
         }}
       >
         우울은 어디에서 와서 어디로 가는걸까?
       </h3>
+      <p
+        style={{
+          paddingBottom: "10px",
+        }}
+      >
+        Welcome to my private space of tender and shy thoughts - where sorrows,
+        cherished memories, and hopes intertwine. Explore the reflections tied
+        to each color and discover your own magical hue. By clicking on the
+        toggle, you can step into the enchanted square or return to this
+        personal haven to read more.
+      </p>
       <p>
         The tragedies of 21st-century Korea include the Sewol ferry disaster,
         followed by the Stellar Daisy ferry incident, the Itaewon tragedy, the
