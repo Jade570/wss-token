@@ -10,7 +10,6 @@ import vertexShader from "../../../shaders/sample.vert";
 import fragmentShader3 from "../../../shaders/sample3.frag";
 import NativeAudioPlayerWithChordProgression from "./components/webaudiotest.js";
 
-
 // 색상 정보 객체 (hue 값)
 const colors = {
   queer: 0,
@@ -23,7 +22,6 @@ const colors = {
 
 // 모델 파일 경로 배열
 const models = ["/planet.glb", "/star.glb", "/heart.glb"];
-
 
 function InitialCameraPosition({ myPlayer }) {
   const { camera } = useThree();
@@ -193,7 +191,12 @@ export default function Square() {
 
   return (
     <>
-      <NativeAudioPlayerWithChordProgression socket={socket} player={players[myId]}/>
+      {players[myId] && (
+        <NativeAudioPlayerWithChordProgression
+          socket={socket}
+          player={players[myId]}
+        />
+      )}
       <Canvas
         style={{ width: "100vw", height: "100vh", background: "#000" }}
         camera={{ position: [0, 0, 50], fov: 55 }}
