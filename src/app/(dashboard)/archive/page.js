@@ -16,6 +16,7 @@ export default function TragediesPage() {
         style={{
           fontStyle: "italic",
           color: "#333",
+          paddingBottom: "40px"
         }}
       >
         우울은 어디에서 와서 어디로 가는걸까?

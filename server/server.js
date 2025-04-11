@@ -81,6 +81,16 @@ io.sockets.on("connection", function (socket) {
     socket.broadcast.emit("players", players);
   });
 
+  socket.on("shake", function (data) {
+    if (!players[data.id]) {
+      console.log("no id for shake");
+      return;
+    }
+    console.log(`Shake event received for ${data.id}`);
+    // 해당 플레이어의 흔들림 이벤트를 다른 모든 클라이언트에게 전파합니다.
+    socket.broadcast.emit("shake", { id: data.id });
+  });
+
   socket.on("disconnect", function () {
     socket.broadcast.emit("killPlayer", socket.id);
     delete players[socket.id];
