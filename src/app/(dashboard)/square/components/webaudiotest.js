@@ -20,8 +20,20 @@ function getChordFrequencies(chordElement) {
   return [0, 0, 0, 0];
 }
 
+// 예시: 각 폴더 내에 존재하는 파일명 배열 (실제 파일명으로 수정)
+const soundFiles = {
+  aricell: ["20240214-creative-response4.wav", "joo_usarmy.wav"],
+  itaewon: ["minseo_yongsanstation.wav", "myungjin_sogang.wav"],
+  osong: ["jiwon_eulsukdo.wav", "woojin_planeandbird.wav"],
+  queer: ["joo_crazybirds.wav", "soojeong_103.wav"],
+  sewol: ["eunji_study.wav", "jiwon_myungdong.wav"],
+  stellar: ["me_ktx_to_seoul.wav", "zero_midnight_lab_alone.wav"],
+};
+
+
 const NativeAudioPlayerWithChordProgression = (props) => {
-  const { socket } = props;
+  const { socket } = props.socket;
+  const player = props.player;
 
   // 자동 재생을 위해 컴포넌트 마운트 시 playAudio()를 호출할 수 있음.
   // (브라우저의 자동 재생 제한에 주의하십시오.)
@@ -95,10 +107,23 @@ const NativeAudioPlayerWithChordProgression = (props) => {
         await audioContext.resume();
       }
 
-      // /sample.m4a 파일 불러오기 및 디코딩
-      const response = await fetch("sounds/" + "jiwon_eulsukdo.wav");
+      // 플레이할 소리 파일 선택
+      // 먼저 player.color에 해당하는 파일 리스트를 가져오고, 그 중 랜덤으로 하나 선택합니다.
+      const files = soundFiles[player.color];
+      console.log(files);
+      if (!files || files.length === 0) {
+        throw new Error(`No sound files found for color: ${player.color}`);
+      }
+      const randomIndex = Math.floor(Math.random() * files.length);
+      const randomFile = files[randomIndex];
+      const soundPath = `sounds/${player.color}/${randomFile}`;
+      console.log("Playing sound from:", soundPath);
+
+      // sound 파일 불러오기 및 디코딩
+      const response = await fetch(soundPath);
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
 
       // AudioBufferSourceNode 생성 (루프 재생)
       const source = audioContext.createBufferSource();

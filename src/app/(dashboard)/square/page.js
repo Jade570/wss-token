@@ -193,7 +193,7 @@ export default function Square() {
 
   return (
     <>
-      <NativeAudioPlayerWithChordProgression socket={socket}/>
+      <NativeAudioPlayerWithChordProgression socket={socket} player={players[myId]}/>
       <Canvas
         style={{ width: "100vw", height: "100vh", background: "#000" }}
         camera={{ position: [0, 0, 50], fov: 55 }}
