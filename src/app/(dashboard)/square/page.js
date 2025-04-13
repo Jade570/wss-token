@@ -1,13 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Html } from "@react-three/drei";
-import * as THREE from "three";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls} from "@react-three/drei";
 import { gsap } from "gsap";
 import { useSocket } from "@/components/socketContext.js"; // 실제 경로에 맞게 수정
-import vertexShader from "@/components/shaders/simple.vert";
-import fragmentShader3 from "@/components/shaders/solid_color.frag";
 import NativeAudioPlayerWithChordProgression from "./components/webaudiotest.js";
 import Wand from "@/components/wand.js";
 import colors from "@/components/generalInfo.js";
