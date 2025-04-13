@@ -2,74 +2,55 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import Data from "../data"; // Data 파일 경로를 실제 경로에 맞게 수정
-
-// 색상 정보 객체 (이전과 동일)
-const tragedies = {
-  queer: 0,
-  stellar: 32,
-  sewol: 60,
-  osong: 110,
-  aricell: 194,
-  itaewon: 265,
-};
+import colors from "../../../../components/generalInfo"; // 각 색상은 [R, G, B] 배열로 정의됨
+import { motion } from "framer-motion";
+import WandCanvas from "@/components/wandCanvas";
 
 export default function TragedyDetail() {
   const params = useParams();
-  const { color } = params; // 예: "queer", "stellar", 등
-  const hue = tragedies[color] || 0;
-  const fontColor = color === "sewol" || color === "osong" ? "#000" : "#fff";
-  const subtitleBrightness =
-    color === "sewol" || color === "osong" ? "20%" : "80%";
-  const isDark = color === "sewol" || color === "osong" ? "_dark" : "";
+  const { color } = params || {};
+  // color 값이 있으면 해당 색상을, 없으면 기본 흰색을 사용합니다.
+  const hue = color && colors[color] ? colors[color] : [255, 255, 255];
 
   return (
-    <div
+    <motion.div
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       style={{
         height: "100%",
-        backgroundColor: `hsl(${hue}, 100%, 50%)`,
+        backgroundColor: `rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`,
         display: "flex",
         flexDirection: "column",
-        color: fontColor,
+        color: color === "yellow" ? "#000" : "#fff",
       }}
     >
-      {/* 고정된 제목 영역 */}
-      <div style={{ padding: "40px", flexShrink: 0, flexDirection: "column" }}>
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <h1 style={{ margin: 0 }}>{Data[color].title}</h1>
-          <div
-            style={{
-              width: "40px",
-              height: "80px",
-              backgroundImage: `url("/ribbon${isDark}.png")`,
-              backgroundSize: "contain",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-              visibility: color === "queer" ? "hidden" : "visible"
-            }}
-          ></div>
-        </div>
-        <div style={{ paddingBottom: "20px" }}>{Data[color].date}</div>
-        <div
-          style={{
-            fontStyle: "italic",
-            color: `hsl(${hue}, 80%, ${subtitleBrightness})`,
-          }}
-        >
-          {Data[color].subtitle}
-        </div>
+      {/* 고정된 제목 영역 등 detail 페이지 내용 */}
+      <div style={{ padding: "40px", flexShrink: 0 }}>
+        <h1>Tragedy Detail Page</h1>
       </div>
-
-      {/* 본문 영역: 내용이 길어지면 스크롤되도록 */}
-      <div
-        style={{
-          padding: "0 40px 40px 40px",
-          overflowY: "auto",
-          flexGrow: 1,
+      <div style={{ padding: "0 40px 40px 40px", overflowY: "auto", flexGrow: 1 }}>
+        {/* 상세 내용 */}
+        <p>여기에 상세 내용이 들어갑니다.</p>
+      </div>
+      {/* 공유 레이아웃 애니메이션을 위한 Wand 캔버스 */}
+      {/* <WandCanvas
+        layoutId="shared-wand"
+        canvasStyle={{
+          position: "fixed",
+          right: "20px",
+          bottom: "0px",
+          width: "30vw",
+          height: "30vh",
+          zIndex: 100,
+          background: "transparent",
         }}
-      >
-        <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{Data[color].text}</p>
-      </div>
-    </div>
+        cameraProps={{ position: [0, 0, 25], fov: 45 }}
+        modelIndex={0}
+        hue={hue}
+        useOrbit={true}
+      /> */}
+    </motion.div>
   );
 }

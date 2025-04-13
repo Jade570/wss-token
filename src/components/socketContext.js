@@ -19,10 +19,10 @@ export function SocketProvider({ children }) {
     setSocket(socketInstance);
 
     socketInstance.on("connect", () => {
-      console.log("웹소켓 연결 성공", socketInstance.id);
+      console.log("websocket connected", socketInstance.id);
     });
     socketInstance.on("disconnect", () => {
-      console.log("웹소켓 연결 종료");
+      console.log("websocket disconnected");
     });
 
     // App Router에서는 페이지 전환 시에도 이 컴포넌트는 계속 유지되도록 _layout.js 또는 layout.js에서 SocketProvider로 감싸야 합니다.

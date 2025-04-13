@@ -5,23 +5,12 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { gsap } from "gsap";
-import { useSocket } from "../../../socketContext.js"; // 실제 경로에 맞게 수정
-import vertexShader from "../../../shaders/sample.vert";
-import fragmentShader3 from "../../../shaders/sample3.frag";
+import { useSocket } from "@/components/socketContext.js"; // 실제 경로에 맞게 수정
+import vertexShader from "@/components/shaders/simple.vert";
+import fragmentShader3 from "@/components/shaders/solid_color.frag";
 import NativeAudioPlayerWithChordProgression from "./components/webaudiotest.js";
-
-// 색상 정보 객체 (hue 값)
-const colors = {
-  queer: 0,
-  stellar: 32,
-  sewol: 60,
-  osong: 110,
-  aricell: 194,
-  itaewon: 265,
-};
-
-// 모델 파일 경로 배열
-const models = ["/planet.glb", "/star.glb", "/heart.glb"];
+import Wand from "@/components/wand.js";
+import colors from "@/components/generalInfo.js";
 
 function InitialCameraPosition({ myPlayer }) {
   const { camera } = useThree();
@@ -39,55 +28,6 @@ function InitialCameraPosition({ myPlayer }) {
   }, [myPlayer, camera]);
 
   return <OrbitControls ref={controlsRef} />;
-}
-
-function Star({ path, hue }) {
-  const gltf = useGLTF(path);
-  const { camera } = useThree();
-
-  // gltf.scene을 클론한 후 각 mesh에 새 ShaderMaterial 적용
-  const clonedScene = React.useMemo(() => {
-    const clone = gltf.scene.clone(true);
-    clone.traverse((child) => {
-      if (child.isMesh) {
-        child.material = new THREE.ShaderMaterial({
-          vertexShader,
-          fragmentShader: fragmentShader3,
-          uniforms: {
-            u_resolution: {
-              value: new THREE.Vector2(window.innerWidth, window.innerHeight),
-            },
-            u_time: { value: 0 },
-            u_flowerFade: { value: 0.0 },
-            u_ambientLightColor: { value: new THREE.Color(0.5, 0.5, 0.5) },
-            u_directionalLightColor: { value: new THREE.Color(1, 1, 1) },
-            u_directionalLightDirection: {
-              value: new THREE.Vector3(5, 5, 5).normalize(),
-            },
-            u_cameraPosition: { value: camera.position.clone() },
-            u_color: { value: hue },
-          },
-        });
-      }
-    });
-    return clone;
-  }, [gltf.scene, camera.position, hue]);
-
-  useFrame(({ clock }) => {
-    clonedScene.traverse((child) => {
-      if (child.isMesh && child.material.uniforms?.u_time) {
-        child.material.uniforms.u_time.value = clock.getElapsedTime();
-        child.material.uniforms.u_cameraPosition.value.copy(camera.position);
-      }
-    });
-  });
-
-  return <primitive object={clonedScene} />;
-}
-
-function Stick() {
-  const gltf = useGLTF("/stick.glb");
-  return <primitive object={gltf.scene.clone(true)} />;
 }
 
 export default function Square() {
@@ -216,26 +156,16 @@ export default function Square() {
           const y = player.y;
           const z = player.z || 0;
           return (
-            <group key={player.id} position={[x, y, z]}>
-              {/* 피벗 그룹: 이 그룹의 origin(0,0,0)이 오브젝트의 아래쪽이 되도록 offset */}
-              <group
-                ref={(el) => {
-                  if (el) {
-                    playerPivotRefs.current[player.id] = el;
-                    console.log(
-                      `Registered pivot ref for ${player.id}:`,
-                      el.position
-                    );
-                  }
-                }}
-                // 예: 오브젝트 높이가 10이라고 가정하면, 피벗 그룹을 [0, 5, 0]으로 offset하여 밑부분이 원점이 되도록 함.
-                position={[0, 5, 0]}
-              >
-                <Star path={models[modelIndex]} hue={hue} />
-                <group position={[0, -5, 0]}>
-                  <Stick />
-                </group>
-              </group>
+            <group
+              key={player.id}
+              position={[x, y, z]}
+              ref={(el) => {
+                if (el) {
+                  playerPivotRefs.current[player.id] = el;
+                }
+              }}
+            >
+              <Wand modelIndex={modelIndex} hue={hue} />
             </group>
           );
         })}

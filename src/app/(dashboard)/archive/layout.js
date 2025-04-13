@@ -1,28 +1,43 @@
+// (dashboard)/archive/layout.js
 "use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import colors from "../../../components/generalInfo"; // 예: { queer: [R,G,B], stellar: [...], ... }
+import Color from "color";
+import WandCanvas from "@/components/wandCanvas"; // 공통 캔버스 컴포넌트
+import { useSocket } from "@/components/socketContext"; // 소켓 컨텍스트에서 useSocket 사용
 
-// 색상 정보 객체 (hue 값)
-// 기존 tragedies 인덱스들: queer, stellar, sewol, osong, aricell, itaewon
-const tragedies = {
-  queer: 0,
-  stellar: 32,
-  sewol: 60,
-  osong: 110,
-  aricell: 194,
-  itaewon: 265,
-};
-
-export default function TragediesLayout({ children }) {
-  const [toggle, setToggle] = useState(false);
+function LayoutWrapper({ children }) {
+  const params = useParams();
+  const { color } = params || {};
+  // URL에 color 값이 있으면 해당 색, 없으면 기본 흰색([255,255,255])
+  const hue = color && colors[color] ? colors[color] : [255, 255, 255];
   const pathname = usePathname();
   const router = useRouter();
+  const [toggle, setToggle] = useState(false);
+
+  const socket = useSocket();
+
+  // 색상 인덱스 버튼 클릭 시 호출되는 핸들러
+  const handleColorClick = (key) => {
+    // 색상을 업데이트하는 것은 라우팅으로 처리되지만, 여기서 소켓 이벤트를 전송합니다.
+    if (socket && socket.id) {
+      console.log("color update,", socket.id, key);
+      socket.emit("colorUpdate", { id: socket.id, color: key });
+    }
+  };
 
   return (
-    <div style={{ display: "flex", height: "100vh" , background: "#fff"}}>
-      {/* 왼쪽 Navbar 영역 - toggle일 때 width가 100vw로 확장 */}
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        backgroundColor: `rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`,
+      }}
+    >
+      {/* 왼쪽 네비게이션 */}
       <div
         style={{
           width: toggle ? "100vw" : "50px",
@@ -36,9 +51,8 @@ export default function TragediesLayout({ children }) {
           paddingBottom: "20px",
         }}
       >
-        {/* 색깔 인덱스 버튼들 (toggle이면 opacity 0으로 사라짐) */}
+        {/* 색상 인덱스 버튼들 */}
         <div
-          className={`color-indexes ${toggle ? "hidden" : ""}`}
           style={{
             display: "flex",
             flexDirection: "column",
@@ -47,53 +61,59 @@ export default function TragediesLayout({ children }) {
             transition: "opacity 0.4s",
           }}
         >
-          {/* 추가 인덱스: 흰색 인덱스, /archive 홈페이지 이동 */}
           <Link key="home" href="/archive">
-              <div
-                style={{
-                  width: pathname === "/archive" ? "35px" : "30px",
-                  height: pathname === "/archive" ? "60px" : "50px",
-                  marginLeft: "auto",
-                  backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
-                  borderTop: pathname === "/archive" ? "2px solid white" : "none",
-                  borderLeft: pathname === "/archive" ? "2px solid white" : "none",
-                  borderBottom: pathname === "/archive" ? "2px solid white" : "none",
-                  borderRight: "none",
-                  borderTopLeftRadius: "8px",
-                  borderBottomLeftRadius: "8px",
-                  cursor: "pointer",
-                }}
-              ></div>
+            <div
+              style={{
+                width: pathname === "/archive" ? "35px" : "30px",
+                height: pathname === "/archive" ? "60px" : "50px",
+                marginLeft: "auto",
+                backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+                borderTop: pathname === "/archive" ? "2px solid white" : "none",
+                borderLeft: pathname === "/archive" ? "2px solid white" : "none",
+                borderBottom: pathname === "/archive" ? "2px solid white" : "none",
+                borderRight: "none",
+                borderTopLeftRadius: "8px",
+                borderBottomLeftRadius: "8px",
+                cursor: "pointer",
+              }}
+            ></div>
           </Link>
-
-          {Object.keys(tragedies).map((key) => {
+          {Object.keys(colors).map((key) => {
             const isSelected = pathname === `/archive/${key}`;
+            const computedColor = isSelected
+              ? `rgb(${colors[key][0]}, ${colors[key][1]}, ${colors[key][2]})`
+              : Color(
+                  `rgb(${colors[key][0]}, ${colors[key][1]}, ${colors[key][2]})`
+                )
+                  .darken(0.35)
+                  .desaturate(0.4)
+                  .rgb()
+                  .string();
             return (
               <Link key={key} href={`/archive/${key}`}>
-                  <div
-                    style={{
-                      width: isSelected ? "35px" : "30px",
-                      height: isSelected ? "60px" : "50px",
-                      marginLeft: "auto",
-                      backgroundColor: isSelected
-                        ? `hsl(${tragedies[key]}, 100%, 50%)`
-                        : `hsl(${tragedies[key]}, 80%, 35%)`,
-                      borderTop: isSelected ? "2px solid white" : "none",
-                      borderLeft: isSelected ? "2px solid white" : "none",
-                      borderBottom: isSelected ? "2px solid white" : "none",
-                      borderRight: "none",
-                      borderTopLeftRadius: "8px",
-                      borderBottomLeftRadius: "8px",
-                      cursor: "pointer",
-                    }}
-                  ></div>
+                <div
+                  // onClick를 추가하여 색상 인덱스 클릭 시 소켓 이벤트 전송
+                  onClick={() => handleColorClick(key)}
+                  style={{
+                    width: isSelected ? "35px" : "30px",
+                    height: isSelected ? "60px" : "50px",
+                    marginLeft: "auto",
+                    backgroundColor: computedColor,
+                    borderTop: isSelected ? "2px solid white" : "none",
+                    borderLeft: isSelected ? "2px solid white" : "none",
+                    borderBottom: isSelected ? "2px solid white" : "none",
+                    borderRight: "none",
+                    borderTopLeftRadius: "8px",
+                    borderBottomLeftRadius: "8px",
+                    cursor: "pointer",
+                  }}
+                ></div>
               </Link>
             );
           })}
         </div>
-        {/* 좌하단 세로 토글 스위치 */}
       </div>
-      {/* 오른쪽 메인 콘텐츠 영역 (toggle이면 숨김 처리) */}
+      {/* 오른쪽 메인 콘텐츠 영역 */}
       <div
         style={{
           flex: 1,
@@ -104,6 +124,26 @@ export default function TragediesLayout({ children }) {
       >
         {children}
       </div>
+      {/* 오른쪽 하단 Wand 캔버스 영역 */}
+      <WandCanvas
+        canvasStyle={{
+          position: "fixed",
+          right: "0px",
+          bottom: "0px",
+          width: "30vw",
+          height: "30vh",
+          zIndex: 100,
+          background: "transparent",
+        }}
+        cameraProps={{ position: [0, 0, 25], fov: 45 }}
+        modelIndex={0}
+        hue={hue}
+        useOrbit={true}
+      />
     </div>
   );
+}
+
+export default function TragediesLayout({ children }) {
+  return <LayoutWrapper>{children}</LayoutWrapper>;
 }

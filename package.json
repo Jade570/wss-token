@@ -13,7 +13,8 @@
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.17.14",
     "bufferutil": "^4.0.9",
-    "framer-motion": "^11.18.1",
+    "color": "^5.0.0",
+    "framer-motion": "^12.6.5",
     "gsap": "^3.12.7",
     "next": "13.4.12",
     "p5": "^1.11.3",
@@ -23,6 +24,7 @@
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.14",
     "three": "^0.173.0",
+    "three-stdlib": "^2.35.15",
     "tone": "^15.0.4",
     "utf-8-validate": "^6.0.5"
   },

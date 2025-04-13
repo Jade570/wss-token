@@ -4,7 +4,7 @@ import './globals.css';
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-const DynamicEarthCanvas = dynamic(() => import("../components/sample"), {
+const DynamicCanvas = dynamic(() => import("../components/generateWand"), {
   ssr: false,
 });
 
@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div style={{background:"#000000ff", margin: 0, overflow: 'hidden' }}>
-      <DynamicEarthCanvas />
+      <DynamicCanvas />
     </div>
   );
 }

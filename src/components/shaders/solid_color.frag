@@ -4,18 +4,16 @@ precision mediump float;
 
 uniform vec2 u_resolution;   // 화면 해상도
 uniform float u_time;        // 시간값
-uniform float u_fade;        // fade 값 (필요시 사용)
 uniform vec3 u_ambientLightColor;         // 앰비언트 라이트 색상
 uniform vec3 u_directionalLightColor;     // 방향성 라이트 색상
 uniform vec3 u_directionalLightDirection; // 방향성 라이트의 방향
-uniform vec3 u_cameraPosition;            // 카메라의 월드 좌표 (Fresnel 효과용)
-uniform int u_color;
+uniform vec3 u_cameraPosition; // 카메라 위치
+uniform vec3 u_color;       // 색상 값 (r,g,b,a)   
 
 // vertex shader에서 전달받은 varyings
-varying vec2 vUv;           // UV 좌표
-varying vec3 vNormal;       // 변환된 법선
-varying vec3 vWorldPosition; // 각 정점의 월드 좌표
-
+varying vec2 vUv; // 텍스처 좌표
+varying vec3 vWorldPosition; // 월드 좌표
+varying vec3 vNormal; // 변환된 법선 벡터
 
 // -- 조명 계산 함수 --
 // 주어진 정규화된 법선(norm)을 기반으로 Lambert 조명 계산을 수행하여
@@ -52,8 +50,9 @@ void main() {
   float hue = float(u_color)/360.0;
   float brightness = 1.0;
   
-  vec3 col = hsb2rgb(vec3(hue, saturation, brightness));
-
+  // vec3 col = hsb2rgb(vec3(hue, saturation, brightness));
+  vec3 col = vec3(mix(0.0, u_color.r, t), mix(0.0, u_color.g, t), mix(0.0, u_color.b, t));
+  // vec3 col = vec3(u_color);
 
  // 현재 픽셀의 화면 좌표를 [0,1] 범위로 정규화 (디버깅용으로 남겨둠)
     vec2 st = gl_FragCoord.xy / u_resolution.xy;
@@ -81,24 +80,6 @@ void main() {
     // 이 부분은 조명 계산과 독립적으로 항상 빛을 내는 느낌을 줍니다.
     vec3 emissive = vec3(0.2, 0.2, 0.2) * (0.5*sin(u_time * 1.2));
     col += emissive;
-
-
-    // // --- Fresnel(림) 효과 계산 ---
-    // // 1. 카메라와 현재 픽셀의 월드 좌표 간의 뷰 방향 계산
-    // vec3 viewDir = normalize(u_cameraPosition - vWorldPosition);
-    // // 2. Fresnel 계수를 계산:
-    // //    - 정점의 법선과 뷰 방향의 내적을 사용해, 정점의 가장자리에서 값이 커지도록 계산
-    // float fresnel = pow(1.0 - max(dot(norm, viewDir), 0.0), 3.0);
-    
-    // // 3. Rim 컬러: 원하는 자체발광(림) 색상을 지정 (여기서는 약간 어두운 회색)
-    // vec3 rimColor = vec3(0.2, 0.2, 0.2) * fresnel;
-    
-    // // 4. 기본 색상에 rim 효과를 추가하여 최종 색상 결정
-    // col += rimColor;
-
-
-    
-
 
     gl_FragColor = vec4(col, 1.0);
 
