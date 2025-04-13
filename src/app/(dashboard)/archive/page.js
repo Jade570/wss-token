@@ -40,25 +40,41 @@ export default function TragediesPage() {
         cherished memories, and hopes intertwine. Explore the reflections tied
         to each color and discover your own magical hue. By clicking on the
         toggle{" "}
-        <img
-          src="/archive_dark.png"
-          alt="emoji"
-          style={{
-            height: "1em", // 텍스트 높이와 맞춤
-            verticalAlign: "middle", // 텍스트와 수직 정렬
-            margin: "0 0.2em", // 텍스트와 약간의 간격
-          }}
-        />
-        <img
-          src="/magic_dark.png"
-          alt="emoji"
-          style={{
-            height: "1em", // 텍스트 높이와 맞춤
-            verticalAlign: "middle", // 텍스트와 수직 정렬
-            margin: "0 0.2em", // 텍스트와 약간의 간격
-          }}
-        />{" "}
-        , you can step into the enchanted square or return to this personal
+        <div style={{ position: "relative", display: "inline-block"}}>
+          <div
+            style={{
+              width: "2.75em",
+              height: "1.5em",
+              backgroundColor: "#fff",
+              border: "1px solid #333",
+              borderRadius: "0.75em",
+            }}
+          ></div>
+          <div
+            style={{
+              position: "absolute",
+              left: "0.2em",
+              top: "0.2em",
+              backgroundColor: "#333",
+              width: "1.2em",
+              height: "1.2em",
+              borderRadius: "50%",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: "1.45em",
+              top: "0.18em",
+              backgroundImage: `url("/archive_dark.png")`,
+              backgroundSize: "cover",
+              width: "1em",
+              height: "1em",
+              borderRadius: "50%",
+            }}
+          />
+        </div>{" "}
+        on the bottom left, you can step into the enchanted square or return to this personal
         haven to read more.
       </p>
       <p
