@@ -102,12 +102,15 @@ function LayoutWrapper({ children }) {
                 marginLeft: "auto",
                 backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
                 borderTop: pathname === "/archive" ? "2px solid white" : "none",
-                borderLeft: pathname === "/archive" ? "2px solid white" : "none",
-                borderBottom: pathname === "/archive" ? "2px solid white" : "none",
+                borderLeft:
+                  pathname === "/archive" ? "2px solid white" : "none",
+                borderBottom:
+                  pathname === "/archive" ? "2px solid white" : "none",
                 borderRight: "none",
                 borderTopLeftRadius: "8px",
                 borderBottomLeftRadius: "8px",
                 cursor: "pointer",
+                transition: "all 0.4s ease",
               }}
             ></div>
           </Link>
@@ -138,6 +141,7 @@ function LayoutWrapper({ children }) {
                     borderTopLeftRadius: "8px",
                     borderBottomLeftRadius: "8px",
                     cursor: "pointer",
+                    transition: "all 0.4s ease",
                   }}
                 ></div>
               </Link>
@@ -168,7 +172,7 @@ function LayoutWrapper({ children }) {
           background: "transparent",
         }}
         cameraProps={{ position: [0, 0, 25], fov: 45 }}
-        modelIndex={myModel}  // 소켓에서 받아온 모델 데이터 사용
+        modelIndex={myModel} // 소켓에서 받아온 모델 데이터 사용
         hue={lastColor}
         useOrbit={true}
       />

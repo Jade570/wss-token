@@ -99,6 +99,8 @@ function LayoutWrapper({ children }) {
             }
             .circle-top {
               top: 2.5px;
+               background-size: 80%;
+               background-repeat: no-repeat;
               background-image: url("/magic.png");
             }
             .circle-bottom {
