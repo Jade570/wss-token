@@ -87,6 +87,27 @@ export default function Square() {
     };
   }, [socket]);
 
+  useEffect(() => {
+    // 내 플레이어 데이터가 있을 때 실행
+    if (!players[myId]) return;
+    const myColorKey = players[myId].color; // 내 플레이어의 color (예: "queer")
+    // 등록된 모든 플레이어 피벗 ref를 순회
+    Object.keys(playerPivotRefs.current).forEach((id) => {
+      if (players[id] && players[id].color === myColorKey) {
+        // 같은 색을 가진 플레이어의 피벗 그룹에 무한 반복 노딩 애니메이션 적용 (y축)
+        gsap.to(playerPivotRefs.current[id].rotation, {
+          duration: 1,
+          y: "+=0.3", // y축으로 약간 회전 (필요에 따라 조절)
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1, // 무한 반복
+          overwrite: "auto",
+        });
+      }
+    });
+  }, [players, myId]);
+  
+
   // entered === 1인 플레이어들만 필터링
   const enteredPlayers = Object.values(players).filter(
     (player) => player.entered === 1

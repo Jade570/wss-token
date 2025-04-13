@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import {  useFrame, useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -23,8 +23,11 @@ function Star({ path, hue }) {
     hue[2] / 255
   );
 
+  // gltf.scene을 복제하여 각 인스턴스가 독립적인 scene을 가지도록 함
+  const clonedScene = React.useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+
   React.useEffect(() => {
-    gltf.scene.traverse((child) => {
+    clonedScene.traverse((child) => {
       if (child.isMesh) {
         child.material = new THREE.ShaderMaterial({
           vertexShader,
@@ -38,23 +41,27 @@ function Star({ path, hue }) {
             u_color: { value: colorVector },
             u_cameraPosition: { value: camera.position.clone() },
           },
-          side: THREE.DoubleSide, // 양면 렌더링 설정 추가
+          side: THREE.DoubleSide, // 양면 렌더링
         });
       }
     });
-  }, [gltf, camera, hue]);
+  }, [clonedScene, camera, hue, colorVector]);
 
-  // 만약 hue가 변경될 때 업데이트가 필요하면 아래 useEffect도 같이 수정
+  // hue가 변경될 때 업데이트
   React.useEffect(() => {
-    gltf.scene.traverse((child) => {
+    clonedScene.traverse((child) => {
       if (child.isMesh && child.material.uniforms?.u_color) {
-        child.material.uniforms.u_color.value = new THREE.Vector3(hue[0] / 255, hue[1] / 255, hue[2] / 255);
+        child.material.uniforms.u_color.value = new THREE.Vector3(
+          hue[0] / 255,
+          hue[1] / 255,
+          hue[2] / 255
+        );
       }
     });
-  }, [hue, gltf, camera]);
+  }, [hue, clonedScene, camera]);
 
   useFrame(({ clock }) => {
-    gltf.scene.traverse((child) => {
+    clonedScene.traverse((child) => {
       if (child.isMesh && child.material.uniforms?.u_time) {
         child.material.uniforms.u_time.value = clock.getElapsedTime();
         child.material.uniforms.u_cameraPosition.value.copy(camera.position);
@@ -62,14 +69,12 @@ function Star({ path, hue }) {
     });
   });
 
-  return <primitive object={gltf.scene} />;
+  return <primitive object={clonedScene} />;
 }
-
 
 // 마법봉 스틱 부분 렌더
 function Stick() {
   const gltf = useGLTF("/stick.glb");
-  // 매 렌더마다 새 인스턴스가 아닌, 처음 한번 clone한 결과를 반환하도록 useMemo 사용
   const stickClone = React.useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   return <primitive object={stickClone} />;
 }

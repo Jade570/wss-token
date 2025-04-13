@@ -1,7 +1,7 @@
 // (dashboard)/archive/layout.js
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import colors from "../../../components/generalInfo"; // 예: { queer: [R,G,B], stellar: [...], ... }
@@ -12,17 +12,49 @@ import { useSocket } from "@/components/socketContext"; // 소켓 컨텍스트�
 function LayoutWrapper({ children }) {
   const params = useParams();
   const { color } = params || {};
-  // URL에 color 값이 있으면 해당 색, 없으면 기본 흰색([255,255,255])
-  const hue = color && colors[color] ? colors[color] : [255, 255, 255];
+  // URL에 color 값이 있으면 해당 색, 없으면 기본 흰색 대신 내 저장된 색(lastColor) 사용
+  const [lastColor, setLastColor] = useState([255, 255, 255]);
+  const hue = color && colors[color] ? colors[color] : lastColor;
+
   const pathname = usePathname();
   const router = useRouter();
   const [toggle, setToggle] = useState(false);
 
   const socket = useSocket();
 
+  // 내 플레이어 데이터(모델 정보 포함)를 저장할 상태
+  const [players, setPlayers] = useState({});
+  const [myModel, setMyModel] = useState(0);
+
+  // URL에 color 파라미터가 없을 경우, 내 아이디의 색상을 소켓에서 받아와 lastColor 업데이트
+  useEffect(() => {
+    if (socket && socket.id && !(color && colors[color])) {
+      socket.emit("getPlayers");
+      const handlePlayers = (data) => {
+        setPlayers(data);
+        if (data[socket.id] && data[socket.id].color) {
+          // 만약 서버에서 color를 키(예:"queer")로 저장했다면,
+          // 해당 키에 대응하는 colors 값을 lastColor로 저장
+          const playerColorKey = data[socket.id].color;
+          if (colors[playerColorKey]) {
+            setLastColor(colors[playerColorKey]);
+          }
+        }
+        if (data[socket.id] && data[socket.id].model !== undefined) {
+          setMyModel(data[socket.id].model);
+        }
+      };
+      socket.on("players", handlePlayers);
+      return () => {
+        socket.off("players", handlePlayers);
+      };
+    }
+  }, [socket, color]);
+
   // 색상 인덱스 버튼 클릭 시 호출되는 핸들러
   const handleColorClick = (key) => {
-    // 색상을 업데이트하는 것은 라우팅으로 처리되지만, 여기서 소켓 이벤트를 전송합니다.
+    const newColor = colors[key]; // [R,G,B]
+    setLastColor(newColor);
     if (socket && socket.id) {
       console.log("color update,", socket.id, key);
       socket.emit("colorUpdate", { id: socket.id, color: key });
@@ -34,7 +66,7 @@ function LayoutWrapper({ children }) {
       style={{
         display: "flex",
         height: "100vh",
-        backgroundColor: `rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`,
+        backgroundColor: "#fff", // 배경은 항상 흰색
       }}
     >
       {/* 왼쪽 네비게이션 */}
@@ -61,6 +93,7 @@ function LayoutWrapper({ children }) {
             transition: "opacity 0.4s",
           }}
         >
+          {/* 흰색 인덱스 (홈 링크) */}
           <Link key="home" href="/archive">
             <div
               style={{
@@ -92,7 +125,6 @@ function LayoutWrapper({ children }) {
             return (
               <Link key={key} href={`/archive/${key}`}>
                 <div
-                  // onClick를 추가하여 색상 인덱스 클릭 시 소켓 이벤트 전송
                   onClick={() => handleColorClick(key)}
                   style={{
                     width: isSelected ? "35px" : "30px",
@@ -136,8 +168,8 @@ function LayoutWrapper({ children }) {
           background: "transparent",
         }}
         cameraProps={{ position: [0, 0, 25], fov: 45 }}
-        modelIndex={0}
-        hue={hue}
+        modelIndex={myModel}  // 소켓에서 받아온 모델 데이터 사용
+        hue={lastColor}
         useOrbit={true}
       />
     </div>
