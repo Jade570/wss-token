@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import colors from "../../../../components/generalInfo"; // 각 색상은 [R, G, B] 배열로 정의됨
 import { motion } from "framer-motion";
@@ -12,6 +13,26 @@ export default function TragedyDetail() {
   const { color } = params || {};
   // color 값이 있으면 해당 색상을, 없으면 기본 흰색을 사용합니다.
   const hue = color && colors[color] ? colors[color] : [255, 255, 255];
+  const components = {
+    a: ({ href, children }) => {
+      return (
+        <Link legacyBehavior href={href}>
+          <a
+            style={{
+              color: "#333",
+              textDecoration: "none",
+              transition: "color 0.3s",
+              borderLeft: "3px solid #8fd9a3",
+              paddingLeft: "5px",
+              backgroundColor: "rgb(228, 248, 232)",
+            }}
+          >
+            {children}
+          </a>
+        </Link>
+      );
+    },
+  };
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -86,9 +107,9 @@ export default function TragedyDetail() {
         }}
       >
         {/* 상세 내용 */}
-        <ReactMarkdown>{Data[color].text}</ReactMarkdown>
-        <div style={{ position: "relative", marginTop:"20px" }}>
-          <hr style={{marginBottom: "1.25em"}}></hr>
+        <ReactMarkdown components={components}>{Data[color].text}</ReactMarkdown>
+        <div style={{ position: "relative", marginTop: "20px" }}>
+          <hr style={{ marginBottom: "1.25em" }}></hr>
           <div
             style={{
               color: color === "yellow" ? "#555" : "#ddd",
@@ -151,21 +172,20 @@ export default function TragedyDetail() {
             {Data[color].tragedy.date}
           </div>
         </div>
-        <ReactMarkdown>{Data[color].tragedy.text}</ReactMarkdown>
+        <ReactMarkdown components={components}>{Data[color].tragedy.text}</ReactMarkdown>
         <style jsx>{`
-        a {
-          color: inherit;
-          text-decoration: none;
-          transition: color 0.3s;
-          border-style: dotted;
-          border: none;
-          border-left: 3px solid #8fd9a3;
-          padding-left: 5px;
-          background-color: rgb(228, 248, 232);
-        }
-      `}</style>
+          a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s;
+            border-style: dotted;
+            border: none;
+            border-left: 3px solid #8fd9a3;
+            padding-left: 5px;
+            background-color: rgb(228, 248, 232);
+          }
+        `}</style>
       </div>
-
     </motion.div>
   );
 }
