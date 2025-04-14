@@ -1,45 +1,35 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls} from "@react-three/drei";
-import { gsap } from "gsap";
-import { useSocket } from "@/components/socketContext.js"; // 실제 경로에 맞게 수정
-import NativeAudioPlayerWithChordProgression from "./components/webaudiotest.js";
-import Wand from "@/components/wand.js";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { useSocket } from "@/components/socketContext.js";
 import colors from "@/components/generalInfo.js";
-
-function InitialCameraPosition({ myPlayer }) {
-  const { camera } = useThree();
-  const controlsRef = useRef();
-
-  useEffect(() => {
-    if (myPlayer && controlsRef.current) {
-      // OrbitControls의 target을 내 플레이어의 위치로 설정
-      controlsRef.current.target.set(myPlayer.x, myPlayer.y, myPlayer.z);
-      controlsRef.current.update();
-      // 만약 카메라 자체도 내 플레이어를 바라보도록 조정하고 싶다면:
-      camera.position.set(myPlayer.x, myPlayer.y, 50);
-      camera.lookAt(myPlayer.x, myPlayer.y, myPlayer.z);
-    }
-  }, [myPlayer, camera]);
-
-  return <OrbitControls ref={controlsRef} />;
-}
+import styles from "./styles.module.css";
+import ModelSelector from "@/components/square/ModelSelector";
+import ColorSelector from "@/components/square/ColorSelector";
+import AudioPlayer from "@/components/square/AudioPlayer";
+import InitialCameraPosition from "./components/initializeCameraPosition";
+import WandGroup from "@/components/square/WandGroup";
+import useWandAnimation from "@/components/square/hooks/useWandAnimation";
 
 export default function Square() {
   const socket = useSocket();
   const [players, setPlayers] = useState({});
-  // 내 플레이어의 피벗 그룹 ref를 저장 (각 플레이어마다 피벗 그룹을 사용)
   const playerPivotRefs = useRef({});
   const [myId, setMyId] = useState(null);
-  const animatingRef = useRef(false);
   const controlsRef = useRef();
+
+  // 모델과 색상 선택 상태
+  const [selectedModel, setSelectedModel] = useState(0);
+  const [selectedColor, setSelectedColor] = useState('queer');
+
+  // 완드 애니메이션 훅 사용
+  const { nodWand } = useWandAnimation({ socket, myId, playerPivotRefs });
 
   useEffect(() => {
     if (!socket) return;
 
-    // 이미 연결되어 있다면 내 id를 설정
     if (socket.id) {
       console.log("Socket already connected with id:", socket.id);
       setMyId(socket.id);
@@ -53,140 +43,66 @@ export default function Square() {
     socket.emit("getPlayers");
 
     const handlePlayers = (data) => {
-      // console.log("Players data:", data);
       setPlayers(data);
     };
+
     socket.on("players", handlePlayers);
-    return () => {
-      socket.off("players", handlePlayers);
-    };
+    return () => socket.off("players", handlePlayers);
   }, [socket]);
 
-  useEffect(() => {
-    if (!socket) return;
-    const handleShake = (data) => {
-      const { id } = data;
-      console.log(`Shake event received for player ${id}`);
-      if (playerPivotRefs.current[id]) {
-        gsap.timeline().to(playerPivotRefs.current[id].rotation, {
-          duration: 0.2,
-          x: "+=0.3",
-          ease: "power1.inOut",
-          yoyo: true,
-          repeat: 1,
-        });
-      }
-    };
-
-    socket.on("shake", handleShake);
-    return () => {
-      socket.off("shake", handleShake);
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    // 내 플레이어 데이터가 있을 때 실행
-    if (!players[myId]) return;
-    const myColorKey = players[myId].color; // 내 플레이어의 color (예: "queer")
-    // 등록된 모든 플레이어 피벗 ref를 순회
-    Object.keys(playerPivotRefs.current).forEach((id) => {
-      if (players[id] && players[id].color === myColorKey) {
-        // 같은 색을 가진 플레이어의 피벗 그룹에 무한 반복 노딩 애니메이션 적용 (y축)
-        gsap.to(playerPivotRefs.current[id].rotation, {
-          duration: 1,
-          y: "+=0.3", // y축으로 약간 회전 (필요에 따라 조절)
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1, // 무한 반복
-          overwrite: "auto",
-        });
-      }
-    });
-  }, [players, myId]);
-  
-
-  // entered === 1인 플레이어들만 필터링
   const enteredPlayers = Object.values(players).filter(
     (player) => player.entered === 1
   );
 
-  // 내 플레이어의 피벗 그룹을 x축 기준으로 회전시키는 노딩 애니메이션 (2회)
-  const nodMyObject = () => {
-    console.log("Shake button clicked, myId:", myId);
-    if (animatingRef.current) {
-      // 이미 애니메이션 진행 중이면 무시합니다.
-      return;
+  // 모델 선택 핸들러
+  const handleModelSelect = (modelIndex) => {
+    setSelectedModel(modelIndex);
+    if (socket && myId) {
+      socket.emit("modelUpdate", { id: myId, model: modelIndex });
     }
-    if (myId && playerPivotRefs.current[myId]) {
-      animatingRef.current = true; // 애니메이션 시작
-      gsap
-        .timeline({
-          onComplete: () => {
-            // 애니메이션이 모두 완료된 후에 플래그를 false로 변경
-            animatingRef.current = false;
-          },
-        })
-        .to(playerPivotRefs.current[myId].rotation, {
-          duration: 0.2,
-          x: "+=0.3", // 회전 각도 (라디안 단위; 필요에 따라 조정)
-          ease: "power1.inOut",
-          yoyo: true,
-          repeat: 1, // 첫 번째 노딩
-        })
-        .to(playerPivotRefs.current[myId].rotation, {
-          duration: 0.2,
-          x: "+=0.3", // 두 번째 노딩
-          ease: "power1.inOut",
-          yoyo: true,
-          repeat: 1,
-        });
-      // 자신의 shake 이벤트를 서버로 전송
-      socket.emit("shake", { id: myId });
-    } else {
-      console.log("No pivot ref found for myId");
+  };
+
+  // 색상 선택 핸들러
+  const handleColorSelect = (colorKey) => {
+    setSelectedColor(colorKey);
+    if (socket && myId) {
+      socket.emit("colorUpdate", { id: myId, color: colorKey });
     }
   };
 
   return (
     <>
+      <ModelSelector onModelSelect={handleModelSelect} />
+      <ColorSelector colors={colors} onColorSelect={handleColorSelect} />
+      
       {players[myId] && (
-        <NativeAudioPlayerWithChordProgression
+        <AudioPlayer
           socket={socket}
           player={players[myId]}
+          className={styles.audioPlayerContainer}
         />
       )}
+
       <Canvas
-        style={{ width: "100vw", height: "100vh", background: "#000" }}
+        className={styles.canvasContainer}
         camera={{ position: [0, 0, 50], fov: 55 }}
-        onClick={nodMyObject}
+        onClick={nodWand}
       >
         <OrbitControls ref={controlsRef} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
-        {/* 내 플레이어 데이터에 따라 초기 카메라 위치 설정 (한 번만 실행) */}
         <InitialCameraPosition myPlayer={players[myId]} />
-        {enteredPlayers.map((player) => {
-          const modelIndex = player.model;
-          const colorKey = player.color;
-          const hue = colors[colorKey] || 0;
-          // 서버에서 할당한 플레이어의 위치 사용
-          const x = player.x;
-          const y = player.y;
-          const z = player.z || 0;
-          return (
-            <group
-              key={player.id}
-              position={[x, y, z]}
-              ref={(el) => {
-                if (el) {
-                  playerPivotRefs.current[player.id] = el;
-                }
-              }}
-            >
-              <Wand modelIndex={modelIndex} hue={hue} />
-            </group>
-          );
-        })}
+        {enteredPlayers.map((player) => (
+          <WandGroup
+            key={player.id}
+            player={player}
+            pivotRef={(el) => {
+              if (el) {
+                playerPivotRefs.current[player.id] = el;
+              }
+            }}
+          />
+        ))}
       </Canvas>
     </>
   );

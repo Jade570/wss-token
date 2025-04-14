@@ -89,7 +89,7 @@ const NativeAudioPlayerWithChordProgression = (props) => {
       console.log("Entered count:", enteredCount);
       // Q 값을 enteredCount에 비례해서 결정합니다.
       // 예를 들어, 기본 Q 값 30에 enteredCount 당 5씩 증가한다고 가정하면:
-      const newQ = 0 + (enteredCount) * 5;
+      const newQ = 0 + (enteredCount) * 3;
       setQValue(newQ);
     };
 

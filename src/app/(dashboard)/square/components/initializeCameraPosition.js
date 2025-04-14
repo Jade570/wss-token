@@ -1,24 +1,18 @@
-import React, { useEffect, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+"use client";
 
-const InitializeCameraPosition = ({ myPlayer }) => {
+import { useEffect } from "react";
+import { useThree } from "@react-three/fiber";
+
+// 초기 카메라 위치 설정 컴포넌트
+export default function InitialCameraPosition({ myPlayer }) {
   const { camera } = useThree();
-  const controlsRef = useRef();
-
+  
   useEffect(() => {
-    if (myPlayer && controlsRef.current) {
-      // OrbitControls의 target을 내 플레이어의 위치로 설정
-      controlsRef.current.target.set(myPlayer.x, myPlayer.y, myPlayer.z);
-      controlsRef.current.update();
-      // 만약 카메라 자체도 내 플레이어를 바라보도록 조정하고 싶다면:
-      camera.position.set(myPlayer.x, myPlayer.y, 50);
-      camera.lookAt(myPlayer.x, myPlayer.y, myPlayer.z);
+    if (myPlayer) {
+      camera.position.x = myPlayer.x;
+      camera.position.y = myPlayer.y;
     }
   }, [myPlayer, camera]);
 
-  return <OrbitControls ref={controlsRef} />;
+  return null;
 }
-
-
-export default InitializeCameraPosition

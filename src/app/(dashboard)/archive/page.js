@@ -2,110 +2,42 @@
 
 import React from "react";
 import ReactMarkdown from "react-markdown";
+import styles from "./styles.module.css";
 
 const components = {
   a: ({ href, children }) => (
     <a
       href={href}
-      style={{
-        color: "inherit", // 원하는 링크 색상
-        textDecoration: "none", // 기본 underline 제거
-        transition: "color 0.3s",
-        borderLeft: "3px solid rgb(143, 217, 216)",
-        paddingLeft: "0.1rem",
-        paddingRight: "0.1rem",
-        backgroundColor: "rgb(228, 248, 244)",
-      }}
-      target="_blank" // 외부 링크인 경우 새 탭으로 열기
+      className={styles.markdownLink}
+      target="_blank"
       rel="noopener noreferrer"
     >
       {children}
     </a>
   ),
-
   p: ({ children }) => (
-    <p
-      style={{
-        paddingBottom: "10px",
-        textIndent: "1em",
-        lineHeight: "1.5",
-        fontFamily: '"PT Serif", serif',
-        fontWeight: 400,
-        fontStyle: "normal",
-        maxWidth: "800px",
-      }}
-    >
-      {children}
-    </p>
+    <p className={styles.markdownParagraph}>{children}</p>
   ),
   li: ({ children }) => (
-    <li
-      style={{
-        paddingBottom: "10px",
-        textIndent: "0",
-        lineHeight: "1.5",
-        fontFamily: '"PT Serif", serif',
-        fontWeight: 400,
-        fontStyle: "normal",
-        maxWidth: "800px",
-        fontSize: "0.6em",
-        whiteSpace: "pre-wrap",
-      }}
-    >
-      {children}
-    </li>
+    <li className={styles.markdownListItem}>{children}</li>
   ),
 };
 
+// 메인 페이지 컴포넌트
 export default function TragediesPage() {
   return (
-    <div
-      style={{
-        padding: "40px",
-        textAlign: "start",
-        background: "#fff",
-        fontFamily: '"Special Gothic Expanded One", "sans-serif"',
-        fontWeight: "400",
-        fontStyle: "normal",
-        marginBlockEnd: "0px",
-        maxWidth: "800px",
-        align: "center",
-      }}
-    >
-      <h1>Where Does Melancholy Come From, and Where Is It Heading?</h1>
-      <h3
-        style={{
-          fontStyle: "italic",
-          color: "#333",
-          paddingBottom: "40px",
-        }}
-      >
-        우울은 어디에서 와서 어디로 가는걸까?
-      </h3>
+    <div className={styles.pageContainer}>
+      <h1 className={styles.pageTitle}>
+        Where Does Melancholy Come From, and Where Is It Heading?
+      </h1>
+      <h3 className={styles.pageSubtitle}>우울은 어디에서 와서 어디로 가는걸까?</h3>
 
-      <h2>WELCOME</h2>
-      <p
-        style={{
-          paddingBottom: "10px",
-          textIndent: "1em",
-          lineHeight: "1.5",
-          fontFamily: '"PT Serif", serif',
-          fontWeight: 400,
-          fontStyle: "normal",
-          maxWidth: "800px",
-        }}
-      >
+      <h2 className={styles.sectionTitle}>WELCOME</h2>
+      <p className={styles.markdownParagraph}>
         Welcome to my private space of tender and shy thoughts - where sorrows,
         cherished memories, and hopes intertwine. Explore the reflections tied
-        to each color and discover your own magical hue. By clicking on the
-        toggle{" "}
-        <div
-          style={{
-            position: "relative",
-            display: "inline-block",
-            marginTop: "-0.2em",
-          }}
-        >
+        to each color and discover your own magical hue. By clicking on the toggle{" "}
+        <div style={{ position: "relative", display: "inline-block", marginTop: "-0.2em" }}>
           <div
             style={{
               width: "2.75em",
@@ -114,7 +46,7 @@ export default function TragediesPage() {
               border: "1px solid #333",
               borderRadius: "0.75em",
             }}
-          ></div>
+          />
           <div
             style={{
               position: "absolute",
@@ -143,17 +75,17 @@ export default function TragediesPage() {
         this personal haven to read more.
       </p>
 
-      <hr />
-      <h2>Magical Girls Metaphor</h2>
+      <hr className={styles.divider} />
+      <h2 className={styles.sectionTitle}>Magical Girls Metaphor</h2>
 
       <ReactMarkdown components={components}>
-        {`The magical girl metaphor heterogeneously counters anti-feminism, imperialism, fascism, and Eurocentrism. This is because the ‘magical girl’ genre itself is always criticized for reinforcing patriarchy by being invariably associated with sexuality. However, magical girls are always the main agents of transformation - that is, they are ever-changing beings.
+        {`The magical girl metaphor heterogeneously counters anti-feminism, imperialism, fascism, and Eurocentrism. This is because the 'magical girl' genre itself is always criticized for reinforcing patriarchy by being invariably associated with sexuality. However, magical girls are always the main agents of transformation - that is, they are ever-changing beings.
 
-Not only do magical girls within their series, but the very genre itself has continually evolved in a meta-critical manner. Initially, if it merely objectified girls, later it incorporated narratives with a more female-subjective perspective through the characteristics of girls’ comics, and it commercially attracted male viewers through the teleological gaze of girls positioned as an intermediate stage between adult women and children [(Saito, 2014)](https://www.cambridge.org/core/journals/journal-of-asian-studies/article/magic-shojo-and-metamorphosis-magical-girl-anime-and-the-challenges-of-changing-gender-identities-in-japanese-society/AAA8B9C5895D35A48C9EFC28495D4F9B?utm_campaign=shareaholic&utm_medium=copy_link&utm_source=bookmark). Moreover, the scope of “girls (shojo)” has been expanded to a broader category - typically those defined as powerless, those who must conceal their identity, or the socially disadvantaged (or those who wish to be seen as such).
+Not only do magical girls within their series, but the very genre itself has continually evolved in a meta-critical manner. Initially, if it merely objectified girls, later it incorporated narratives with a more female-subjective perspective through the characteristics of girls' comics, and it commercially attracted male viewers through the teleological gaze of girls positioned as an intermediate stage between adult women and children [(Saito, 2014)](https://www.cambridge.org/core/journals/journal-of-asian-studies/article/magic-shojo-and-metamorphosis-magical-girl-anime-and-the-challenges-of-changing-gender-identities-in-japanese-society/AAA8B9C5895D35A48C9EFC28495D4F9B?utm_campaign=shareaholic&utm_medium=copy_link&utm_source=bookmark). Moreover, the scope of "girls (shojo)" has been expanded to a broader category - typically those defined as powerless, those who must conceal their identity, or the socially disadvantaged (or those who wish to be seen as such).
 
-Because of this, they align with Karen Barad’s ontology - agential reality -, which views phenomena in themselves rather than as mere material substances. They change freely and do not possess a “solid identity [\(Barad, 2015\)](https://doi.org/10.1215/10642684-2843239).” The most important aspect of magical girls, “girlishness,” operates in a similar way.
+Because of this, they align with Karen Barad's ontology - agential reality -, which views phenomena in themselves rather than as mere material substances. They change freely and do not possess a "solid identity [\(Barad, 2015\)](https://doi.org/10.1215/10642684-2843239)." The most important aspect of magical girls, "girlishness," operates in a similar way.
 
-It is entirely pure and asexual, and it can change in one way or another through transformation. “Cuteness and the grotesque overlap, pull, and depend on each other [(Kwon Juria (2018)](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09024446)”—this is the unique characteristic of magical girls, comparable to other Western heroes: adding the “cuteness” attribute, these magical girls sing of “world peace” and love, and in doing so, they represent diversity and change rather than uniformity, thereby countering Eurocentrism, imperialism, and anti-feminism.`}
+It is entirely pure and asexual, and it can change in one way or another through transformation. "Cuteness and the grotesque overlap, pull, and depend on each other [(Kwon Juria (2018)](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09024446)"—this is the unique characteristic of magical girls, comparable to other Western heroes: adding the "cuteness" attribute, these magical girls sing of "world peace" and love, and in doing so, they represent diversity and change rather than uniformity, thereby countering Eurocentrism, imperialism, and anti-feminism.`}
       </ReactMarkdown>
 
       <ReactMarkdown components={components}>
@@ -164,82 +96,41 @@ It is entirely pure and asexual, and it can change in one way or another through
 3. (Kwon Juria (2018). Cuteness and disability, cultural play of deformed things. *The Korean Literature Association*, (79), 35-66.[https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09024446](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09024446)`}
       </ReactMarkdown>
 
-      <hr />
-
-      <h2>Tragedies in the 21st Century Korea, Ribbons, and Colors</h2>
-      <p
-        style={{
-          paddingBottom: "10px",
-          textIndent: "1em",
-          lineHeight: "1.5",
-          fontFamily: '"PT Serif", serif',
-          fontWeight: 400,
-          fontStyle: "normal",
-          maxWidth: "800px",
-        }}
-      >
+      <hr className={styles.divider} />
+      <h2 className={styles.sectionTitle}>Tragedies in the 21st Century Korea, Ribbons, and Colors</h2>
+      <p className={styles.markdownParagraph}>
         The tragedies in the 21st Century Korea include{" "}
         <a
           href="/archive/yellow#tragedy-21c"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-            borderLeft: "3px solid rgb(216, 209, 124)",
-            paddingLeft: "5px",
-            backgroundColor: `rgb(248, 248, 228)`,
-          }}
+          className={styles.markdownLink}
         >
           the Sewol ferry disaster
         </a>{" "}
         , followed by{" "}
         <a
           href="/archive/orange#tragedy-21c"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-            borderLeft: "3px solid rgb(216, 184, 124)",
-            paddingLeft: "5px",
-            backgroundColor: `rgb(248, 242, 228)`,
-          }}
+          className={styles.markdownLink}
         >
           the Stellar Daisy ferry incident
         </a>{" "}
         ,{" "}
         <a
           href="/archive/violet#tragedy-21c"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-            borderLeft: "3px solid rgb(198, 124, 216)",
-            paddingLeft: "5px",
-            backgroundColor: `rgb(241, 228, 248)`,
-          }}
+          className={styles.markdownLink}
         >
           the Itaewon tragedy
         </a>{" "}
         ,{" "}
         <a
           href="/archive/green#tragedy-21c"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-            borderLeft: "3px solid rgb(124, 216, 141)",
-            paddingLeft: "5px",
-            backgroundColor: `rgb(229, 248, 228)`,
-          }}
+          className={styles.markdownLink}
         >
           the Osong underpass tragedy
         </a>
         , and{" "}
         <a
           href="/archive/blue#tragedy-21c"
-          style={{
-            color: "inherit",
-            textDecoration: "none",
-            borderLeft: "3px solid rgb(124, 170, 216)",
-            paddingLeft: "5px",
-            backgroundColor: `rgb(228, 235, 248)`,
-          }}
+          className={styles.markdownLink}
         >
           the Aricell battery factory fire
         </a>
@@ -248,20 +139,9 @@ It is entirely pure and asexual, and it can change in one way or another through
         have occurred, and were all caused by human actions.
       </p>
 
-      <hr />
-      <h2>The Space - Jade Scape</h2>
-      <p
-        style={{
-          paddingBottom: "10px",
-          textIndent: "1em",
-          lineHeight: "1.5",
-          fontFamily: '"PT Serif", serif',
-          fontWeight: 400,
-          fontStyle: "normal",
-          maxWidth: "800px",
-          whiteSpace: "pre-wrap",
-        }}
-      >
+      <hr className={styles.divider} />
+      <h2 className={styles.sectionTitle}>The Space - Jade Scape</h2>
+      <p className={styles.markdownParagraph}>
         {`The endlessly stretching horizon from the left end to right end of the sight was, paradoxically, the most isolated space dividing regions, and the gap in between was the only place where a small, lost human could pause to catch their breath alone.
 
 Nature tends to stretch its hand wide to embrace me.

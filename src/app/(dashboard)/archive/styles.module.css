@@ -1,0 +1,77 @@
+/* 아카이브 페이지 마크다운 컴포넌트 스타일링 */
+.markdownLink {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s;
+  border-left: 3px solid rgb(143, 217, 216);
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+  background-color: rgb(228, 248, 244);
+}
+
+.markdownLink[target="_blank"] {
+  border-left: 3px solid rgb(143, 217, 216);
+}
+
+.markdownParagraph {
+  padding-bottom: 10px;
+  text-indent: 1em;
+  line-height: 1.5;
+  font-family: "PT Serif", serif;
+  font-weight: 400;
+  font-style: normal;
+  max-width: 800px;
+}
+
+.markdownListItem {
+  padding-bottom: 10px;
+  text-indent: 0;
+  line-height: 1.5;
+  font-family: "PT Serif", serif;
+  font-weight: 400;
+  font-style: normal;
+  max-width: 800px;
+  font-size: 0.6em;
+  white-space: pre-wrap;
+}
+
+.pageContainer {
+  padding: 40px;
+  text-align: start;
+  background: #fff;
+  font-family: "Special Gothic Expanded One", "sans-serif";
+  font-weight: 400;
+  font-style: normal;
+  margin-block-end: 0px;
+  max-width: 800px;
+  align: center;
+}
+
+.pageTitle {
+  font-family: "Special Gothic Expanded One", "sans-serif";
+  font-weight: 400;
+  font-style: normal;
+  padding-bottom: 0px;
+  margin-block-end: 0px;
+}
+
+.pageSubtitle {
+  font-style: italic;
+  color: #333;
+  padding-bottom: 40px;
+}
+
+/* 디바이더 스타일 */
+.divider {
+  margin: 40px 0;
+  max-width: 800px;
+}
+
+/* 섹션 제목 스타일 */
+.sectionTitle {
+  padding: 10px;
+  text-align: start;
+  font-family: "Special Gothic Expanded One", "sans-serif";
+  text-indent: 0;
+  color: #333;
+}
