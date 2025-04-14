@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from "react";
 import chordFrequencies from "./chordFrequencies";
 import chordProgression from "./chordProgressions";
 import noteToFrequency from "./webAudioFunc";
+import { useSocket } from "@/components/socketContext.js"; // 실제 경로에 맞게 수정
 
 // chordProgression의 한 요소(문자열 또는 배열)를 받아 4개의 주파수 배열로 변환하는 함수
 function getChordFrequencies(chordElement) {
@@ -41,7 +42,7 @@ const soundFiles = {
 
 
 const NativeAudioPlayerWithChordProgression = (props) => {
-  const { socket } = props.socket;
+  const socket = useSocket();
   const player = props.player;
 
   // 자동 재생을 위해 컴포넌트 마운트 시 playAudio()를 호출할 수 있음.
@@ -68,8 +69,6 @@ const NativeAudioPlayerWithChordProgression = (props) => {
   const [volume, setVolume] = useState(1);
 
   // chordProgression 선택 상태 (default: marching_new)
-  const [selectedProgression, setSelectedProgression] =
-    useState("marching_new");
   const selectedProgressionRef = useRef("marching_new");
 
   // Socket.IO 클라이언트 연결 (필요 시 사용)
@@ -80,7 +79,8 @@ const NativeAudioPlayerWithChordProgression = (props) => {
   }, [qValue]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      return};
     const handlePlayersForQ = (data) => {
       // data는 players 객체로 전달됩니다.
       const enteredCount = Object.values(data).filter(
@@ -240,10 +240,10 @@ const NativeAudioPlayerWithChordProgression = (props) => {
               0.01
             );
           });
-          console.log(
-            `Bar ${measureIndexRef.current + 1}: ${currentElement}`,
-            freqs
-          );
+          // console.log(
+          //   `Bar ${measureIndexRef.current + 1}: ${currentElement}`,
+          //   freqs
+          // );
           measureIndexRef.current++;
           const tId = setTimeout(scheduleMeasure, measureDuration * 1000);
           timeoutsRef.current.push(tId);
@@ -265,12 +265,12 @@ const NativeAudioPlayerWithChordProgression = (props) => {
                   0.01
                 );
               });
-              console.log(
-                `Bar ${measureIndexRef.current + 1} - Subdivision ${
-                  idx + 1
-                }/${subdivisions}: ${subChord}`,
-                freqs
-              );
+              // console.log(
+              //   `Bar ${measureIndexRef.current + 1} - Subdivision ${
+              //     idx + 1
+              //   }/${subdivisions}: ${subChord}`,
+              //   freqs
+              // );
             }, idx * subDuration * 1000);
             timeoutsRef.current.push(tId);
           });

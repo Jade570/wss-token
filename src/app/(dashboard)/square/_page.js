@@ -1,13 +1,26 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls} from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { OrbitControls, useGLTF, Html } from "@react-three/drei";
+import * as THREE from "three";
 import { gsap } from "gsap";
-import { useSocket } from "@/components/socketContext.js"; // 실제 경로에 맞게 수정
-import NativeAudioPlayerWithChordProgression from "./components/webaudiotest.js";
+import { useSocket } from "../../../socketContext.js"; // 실제 경로에 맞게 수정
 import Wand from "@/components/wand.js";
-import colors from "@/components/generalInfo.js";
+import NativeAudioPlayerWithChordProgression from "./components/webaudiotest.js";
+
+// 색상 정보 객체 (hue 값)
+const colors = {
+  queer: 0,
+  stellar: 32,
+  sewol: 60,
+  osong: 110,
+  aricell: 194,
+  itaewon: 265,
+};
+
+// 모델 파일 경로 배열
+const models = ["/planet.glb", "/star.glb", "/heart.glb"];
 
 function InitialCameraPosition({ myPlayer }) {
   const { camera } = useThree();
@@ -53,7 +66,7 @@ export default function Square() {
     socket.emit("getPlayers");
 
     const handlePlayers = (data) => {
-      // console.log("Players data:", data);
+      console.log("Players data:", data);
       setPlayers(data);
     };
     socket.on("players", handlePlayers);
@@ -83,27 +96,6 @@ export default function Square() {
       socket.off("shake", handleShake);
     };
   }, [socket]);
-
-  useEffect(() => {
-    // 내 플레이어 데이터가 있을 때 실행
-    if (!players[myId]) return;
-    const myColorKey = players[myId].color; // 내 플레이어의 color (예: "queer")
-    // 등록된 모든 플레이어 피벗 ref를 순회
-    Object.keys(playerPivotRefs.current).forEach((id) => {
-      if (players[id] && players[id].color === myColorKey) {
-        // 같은 색을 가진 플레이어의 피벗 그룹에 무한 반복 노딩 애니메이션 적용 (y축)
-        gsap.to(playerPivotRefs.current[id].rotation, {
-          duration: 1,
-          y: "+=0.3", // y축으로 약간 회전 (필요에 따라 조절)
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1, // 무한 반복
-          overwrite: "auto",
-        });
-      }
-    });
-  }, [players, myId]);
-  
 
   // entered === 1인 플레이어들만 필터링
   const enteredPlayers = Object.values(players).filter(
@@ -174,16 +166,26 @@ export default function Square() {
           const y = player.y;
           const z = player.z || 0;
           return (
-            <group
-              key={player.id}
-              position={[x, y, z]}
-              ref={(el) => {
-                if (el) {
-                  playerPivotRefs.current[player.id] = el;
-                }
-              }}
-            >
-              <Wand modelIndex={modelIndex} hue={hue} />
+            <group key={player.id} position={[x, y, z]}>
+              {/* 피벗 그룹: 이 그룹의 origin(0,0,0)이 오브젝트의 아래쪽이 되도록 offset */}
+              {/* <group
+                ref={(el) => {
+                  if (el) {
+                    playerPivotRefs.current[player.id] = el;
+                    console.log(
+                      `Registered pivot ref for ${player.id}:`,
+                      el.position
+                    );
+                  }
+                }}
+                // 예: 오브젝트 높이가 10이라고 가정하면, 피벗 그룹을 [0, 5, 0]으로 offset하여 밑부분이 원점이 되도록 함.
+                position={[0, 5, 0]}
+              >
+                <Star path={models[modelIndex]} hue={hue} />
+                <group position={[0, -5, 0]}>
+                  <Stick />
+                </group>
+              </group> */}
             </group>
           );
         })}
