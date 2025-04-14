@@ -180,9 +180,10 @@ export default function TragedyDetail() {
             transition: color 0.3s;
             border-style: dotted;
             border: none;
-            border-left: 3px solid #8fd9a3;
-            padding-left: 5px;
-            background-color: rgb(228, 248, 232);
+            border-left: 3px solid rgb(143, 217, 216);
+            padding-left: "0.1rem",
+            padding-right: "0.1rem",
+            background-color: rgb(228, 248, 244);
           }
         `}</style>
       </div>

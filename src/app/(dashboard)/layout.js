@@ -5,8 +5,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import colors from "@/components/generalInfo"; // 예: { queer: [R,G,B], stellar: [...], ... }
-import Color from "color";
-import { AnimatePresence, motion } from "framer-motion";
+
 import { ToggleProvider, useToggle } from "@/components/toggleContext";
 
 function LayoutWrapper({ children }) {
