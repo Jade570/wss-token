@@ -1,5 +1,7 @@
+"use client";
+
 const chordProgression = {
-    //임을 위한 행진곡 원 악보 코드진행행
+    // 임을 위한 행진곡 원 악보 코드진행
     "marching_orig": ["Am", "Am", "Am", "E7",
         "Dm", "Am", "E7", "Am",
         "Am", "Am", "Am", "E7",
@@ -9,7 +11,7 @@ const chordProgression = {
         "Am", "Dm", "Am", "E7",
         "Am", "Am", "E7", "Am"],
 
-    // 임을 위한 행진곡 최도은버전  C minor, https://youtu.be/-6gXbgUEc_c?si=Z9g2yPcE3xr4Loj8
+    // 임을 위한 행진곡 최도은버전 C minor
     "marching_new": [
         "Cm", "Cm", ["Cm", "Cm", "Cm", "Ddim7"], ["Eb", "CtoE"],
         "Fm", "Cm", "G", "Cm",
@@ -19,9 +21,8 @@ const chordProgression = {
         "Fm", "Cm", "Dhalfdim7", ["Csus4", "G"],
         "Cm", "Fm", "Eb", "G",
         "Cm", "Eb", "G", "Cm"
-      ],
+    ],
      
-    //   
     "new_world_intro":[
         "C", "C", "D", "D"
     ],
@@ -40,9 +41,6 @@ const chordProgression = {
         ["C", "D"], "Em", ["C", "D"], ["Esus4", "Em"],
         ["C", "D"],["Bm7", "Em"],"F", ["Bm7", "B"],
     ],
-
-}
+};
 
 export default chordProgression;
-
-

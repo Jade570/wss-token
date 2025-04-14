@@ -18,15 +18,12 @@ const chordFrequencies = {
   Eb: ["Eb3", "G3", "Bb3", "Eb4"],
   Em: ["E3", "G3", "B3", "E4"],
   EmtoB: ["B2", "E3", "G3", "B3"],
-  E7: ["E3", "G#3", "B3", "D4"], 
+  E7: ["E3", "G#3", "B3", "D4"],
   Esus4:["E3", "A3", "B3", "E4"],
   F: ["C3", "F3", "A3", "C4"],
   Fm: ["C3", "F3", "Ab3", "C4"],
   G: ["D3", "G3", "B3", "D4"],
   G7: ["D3", "F#3", "B3", "D4"],
-  
-  
-  
 };
 
 export default chordFrequencies;

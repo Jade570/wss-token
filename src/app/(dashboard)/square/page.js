@@ -9,7 +9,7 @@ import styles from "./styles.module.css";
 import ModelSelector from "@/components/square/ModelSelector";
 import ColorSelector from "@/components/square/ColorSelector";
 import AudioPlayer from "@/components/square/AudioPlayer";
-import InitialCameraPosition from "./components/initializeCameraPosition";
+import InitialCameraPosition from "@/components/square/components/InitialCameraPosition";
 import WandGroup from "@/components/square/WandGroup";
 import useWandAnimation from "@/components/square/hooks/useWandAnimation";
 
