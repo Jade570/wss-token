@@ -54,7 +54,7 @@ const components = {
     >
       {children}
     </li>
-  ),  
+  ),
 };
 
 export default function TragediesPage() {
@@ -158,6 +158,7 @@ It is entirely pure and asexual, and it can change in one way or another through
 
       <ReactMarkdown components={components}>
         {`
+#### Bibliography
 1. Saito, K. (2014). Magic, Shōjo, and Metamorphosis: Magical Girl Anime and the Challenges of Changing Gender Identities in Japanese Society. *The Journal of Asian Studies*, 73(1), 143–164. [https://doi.org/10.1017/S0021911813001708](https://doi.org/10.1017/S0021911813001708)
 2. Barad, K. (2015). TransMaterialities: Trans*/Matter/Realities and Queer Political Imaginings. *GLQ: A Journal of Lesbian and Gay Studies*, 21(2–3), 387–422. [https://doi.org/10.1215/10642684-2843239](https://doi.org/10.1215/10642684-2843239)          
 3. (Kwon Juria (2018). Cuteness and disability, cultural play of deformed things. *The Korean Literature Association*, (79), 35-66.[https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09024446](https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE09024446)`}
@@ -216,8 +217,20 @@ It is entirely pure and asexual, and it can change in one way or another through
         >
           the Itaewon tragedy
         </a>{" "}
-        , <a href="/archive/green#tragedy-21c">the Osong underpass tragedy</a>,
-        and{" "}
+        ,{" "}
+        <a
+          href="/archive/green#tragedy-21c"
+          style={{
+            color: "inherit",
+            textDecoration: "none",
+            borderLeft: "3px solid rgb(124, 216, 141)",
+            paddingLeft: "5px",
+            backgroundColor: `rgb(229, 248, 228)`,
+          }}
+        >
+          the Osong underpass tragedy
+        </a>
+        , and{" "}
         <a
           href="/archive/blue#tragedy-21c"
           style={{
@@ -277,9 +290,9 @@ My father's ability is to materialize things into a form of machine. With my jad
           transition: color 0.3s;
           border-style: dotted;
           border: none;
-          border-left: 3px solid #8fd9a3;
+          border-left: 3px solid rgb(143, 217, 216);
           padding-left: 5px;
-          background-color: rgb(228, 248, 232);
+          background-color: rgb(228, 248, 244);
         }
         hr {margin:40px 0;
             max-width: 800px;}
