@@ -126,7 +126,7 @@ export default function AudioPlayer({ socket, player, className, players }) {
       currentChordIndexRef.current = (currentChordIndexRef.current + 1) % progression.length;
     };
 
-    const intervalId = setInterval(updateFilterFrequencies, 1000);
+    const intervalId = setInterval(updateFilterFrequencies, 2000); // Changed from 1000ms to 2000ms
     updateFilterFrequencies(); // Update frequencies immediately
     
     return () => clearInterval(intervalId);
