@@ -2,29 +2,73 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSocket } from "./socketContext";
 
 export default function AuthGuard({ children }) {
   const router = useRouter();
   const socket = useSocket();
   const [ready, setReady] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // 소켓 인스턴스가 아직 null이면 연결 중이므로 대기
-    if (!socket) return;
-
-    // 소켓이 연결되었으나 socket.id가 없다면 /restricted로 리디렉션
-    if (!socket.id) {
-      router.push("/restricted");
-    } else {
+    // If we're already on the restricted page, don't redirect
+    if (pathname === "/restricted") {
       setReady(true);
+      return;
     }
-  }, [socket, router]);
+
+    if (!socket) {
+      setReady(false);
+      return;
+    }
+
+    const handleConnect = () => {
+      if (socket.id) {
+        setReady(true);
+      } else {
+        router.push("/restricted");
+      }
+    };
+
+    const handleDisconnect = () => {
+      setReady(false);
+      if (pathname !== "/restricted") {
+        router.push("/restricted");
+      }
+    };
+
+    // Check initial connection state
+    if (socket.connected && socket.id) {
+      setReady(true);
+    } else {
+      router.push("/restricted");
+    }
+
+    // Listen for connection events
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
+  }, [socket, router, pathname]);
 
   if (!ready) {
-    // 로딩 상태 또는 빈 화면을 렌더링합니다.
-    return <div>Loading...</div>;
+    return (
+      <div style={{ 
+        height: "100vh", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center",
+        background: "#000",
+        color: "#fff",
+        fontFamily: '"PT Serif", serif'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
   return children;

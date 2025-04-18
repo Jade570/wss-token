@@ -1,0 +1,64 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.title {
+  color: var(--foreground);
+  font-family: "Special Gothic Expanded One", "sans-serif";
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.message {
+  color: var(--foreground);
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  font-family: "PT Serif", serif;
+}
+
+.helpText {
+  color: var(--foreground);
+  font-size: 0.9em;
+  margin-bottom: 20px;
+  font-family: "PT Serif", serif;
+}
+
+.generateButton {
+  background: transparent;
+  border: 2px solid var(--foreground);
+  color: var(--foreground);
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Special Gothic Expanded One", "sans-serif";
+}
+
+.generateButton:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -4,10 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { useSocket } from "@/components/socketContext.js";
-import colors from "@/components/generalInfo.js";
 import styles from "./styles.module.css";
-import ModelSelector from "@/components/square/ModelSelector";
-import ColorSelector from "@/components/square/ColorSelector";
 import AudioPlayer from "@/components/square/AudioPlayer";
 import InitialCameraPosition from "@/components/square/components/InitialCameraPosition";
 import WandGroup from "@/components/square/WandGroup";
@@ -19,10 +16,6 @@ export default function Square() {
   const playerPivotRefs = useRef({});
   const [myId, setMyId] = useState(null);
   const controlsRef = useRef();
-
-  // 모델과 색상 선택 상태
-  const [selectedModel, setSelectedModel] = useState(0);
-  const [selectedColor, setSelectedColor] = useState('queer');
 
   // 완드 애니메이션 훅 사용
   const { nodWand } = useWandAnimation({ socket, myId, playerPivotRefs });
@@ -54,27 +47,8 @@ export default function Square() {
     (player) => player.entered === 1
   );
 
-  // 모델 선택 핸들러
-  const handleModelSelect = (modelIndex) => {
-    setSelectedModel(modelIndex);
-    if (socket && myId) {
-      socket.emit("modelUpdate", { id: myId, model: modelIndex });
-    }
-  };
-
-  // 색상 선택 핸들러
-  const handleColorSelect = (colorKey) => {
-    setSelectedColor(colorKey);
-    if (socket && myId) {
-      socket.emit("colorUpdate", { id: myId, color: colorKey });
-    }
-  };
-
   return (
     <>
-      <ModelSelector onModelSelect={handleModelSelect} />
-      <ColorSelector colors={colors} onColorSelect={handleColorSelect} />
-      
       {players[myId] && (
         <AudioPlayer
           socket={socket}
