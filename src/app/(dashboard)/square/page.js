@@ -16,36 +16,46 @@ export default function Square() {
   const playerPivotRefs = useRef({});
   const [myId, setMyId] = useState(null);
   const controlsRef = useRef();
+  const [myPosition, setMyPosition] = useState({ x: 0, y: 0, z: 0 });
 
-  // 완드 애니메이션 훅 사용
   const { nodWand } = useWandAnimation({ socket, myId, playerPivotRefs });
 
   useEffect(() => {
     if (!socket) return;
 
     if (socket.id) {
-      console.log("Socket already connected with id:", socket.id);
       setMyId(socket.id);
+      socket.emit("enteredUpdate", { id: socket.id, entered: 1 });
+      socket.emit("positionUpdate", { id: socket.id, ...myPosition });
     }
 
     socket.on("connect", () => {
-      console.log("Connected with id:", socket.id);
       setMyId(socket.id);
+      socket.emit("enteredUpdate", { id: socket.id, entered: 1 });
+      socket.emit("positionUpdate", { id: socket.id, ...myPosition });
     });
-
-    socket.emit("getPlayers");
 
     const handlePlayers = (data) => {
       setPlayers(data);
+      if (data[socket.id] && controlsRef.current) {
+        // Update OrbitControls target to player's position
+        controlsRef.current.target.set(
+          data[socket.id].x || 0,
+          data[socket.id].y || 0,
+          data[socket.id].z || 0
+        );
+      }
     };
 
+    socket.emit("getPlayers");
     socket.on("players", handlePlayers);
-    return () => socket.off("players", handlePlayers);
-  }, [socket]);
+    
+    return () => {
+      socket.off("players", handlePlayers);
+    };
+  }, [socket, myPosition]);
 
-  const enteredPlayers = Object.values(players).filter(
-    (player) => player.entered === 1
-  );
+  const enteredPlayers = Object.values(players).filter(player => player.entered === 1);
 
   return (
     <>
@@ -59,13 +69,24 @@ export default function Square() {
 
       <Canvas
         className={styles.canvasContainer}
-        camera={{ position: [0, 0, 50], fov: 55 }}
-        onClick={nodWand}
+        camera={{ position: [0, 5, 15], fov: 75 }}
       >
-        <OrbitControls ref={controlsRef} />
-        <ambientLight intensity={0.5} />
+        <ambientLight intensity={0.7} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
-        <InitialCameraPosition myPlayer={players[myId]} />
+        <pointLight position={[0, 0, 0]} intensity={0.5} />
+        
+        <OrbitControls 
+          ref={controlsRef}
+          enablePan={true}
+          minDistance={5}
+          maxDistance={50}
+          target={[myPosition.x, myPosition.y, myPosition.z]}
+          enableDamping={true}
+          dampingFactor={0.05}
+        />
+
+        {players[myId] && <InitialCameraPosition myPlayer={players[myId]} />}
+        
         {enteredPlayers.map((player) => (
           <WandGroup
             key={player.id}

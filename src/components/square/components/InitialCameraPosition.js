@@ -1,17 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
+import * as THREE from "three";
 
-// 초기 카메라 위치 설정 컴포넌트
 export default function InitialCameraPosition({ myPlayer }) {
-  const { camera } = useThree();
-  
+  const { camera, controls } = useThree();
+
   useEffect(() => {
-    if (myPlayer) {
-      camera.position.x = myPlayer.x;
-      camera.position.y = myPlayer.y;
-    }
+    if (!myPlayer) return;
+
+    // Set camera position relative to player's wand
+    const targetPosition = new THREE.Vector3(
+      myPlayer.x,
+      myPlayer.y, // Position slightly above the wand
+      myPlayer.z + 50  // Position behind the wand
+    );
+
+    // Set the camera position
+    camera.position.set(targetPosition.x, targetPosition.y, targetPosition.z);
+    
+    // Make camera look at the player's wand
+    const wandPosition = new THREE.Vector3(myPlayer.x, myPlayer.y, myPlayer.z);
+    camera.lookAt(wandPosition);
   }, [myPlayer, camera]);
 
   return null;

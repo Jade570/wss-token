@@ -8,30 +8,20 @@ import * as THREE from "three";
 import vertexShader from "./shaders/simple.vert";
 import fragmentShader from "./shaders/solid_color.frag";
 
-// 모델 파일 경로 배열
 const models = ["/planet.glb", "/star.glb", "/heart.glb"];
 
-// 마법봉 머리 부분 렌더
 function Star({ path, hue }) {
   const gltf = useGLTF(path);
   const { camera } = useThree();
+  const colorVector = new THREE.Vector3(hue[0] / 255, hue[1] / 255, hue[2] / 255);
 
-  // hue 배열을 THREE.Vector3로 변환 (RGB 값을 [0,1] 범위로 변환)
-  const colorVector = new THREE.Vector3(
-    hue[0] / 255,
-    hue[1] / 255,
-    hue[2] / 255
-  );
-
-  // gltf.scene을 복제하여 각 인스턴스가 독립적인 scene을 가지도록 함
-  const clonedScene = React.useMemo(() => gltf.scene.clone(true), [gltf.scene]);
-
-  React.useEffect(() => {
-    clonedScene.traverse((child) => {
+  const clonedScene = React.useMemo(() => {
+    const scene = gltf.scene.clone(true);
+    scene.traverse((child) => {
       if (child.isMesh) {
         child.material = new THREE.ShaderMaterial({
           vertexShader,
-          fragmentShader: fragmentShader,
+          fragmentShader,
           uniforms: {
             u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
             u_time: { value: 0 },
@@ -41,28 +31,16 @@ function Star({ path, hue }) {
             u_color: { value: colorVector },
             u_cameraPosition: { value: camera.position.clone() },
           },
-          side: THREE.DoubleSide, // 양면 렌더링
+          side: THREE.DoubleSide,
         });
       }
     });
-  }, [clonedScene, camera, hue, colorVector]);
-
-  // hue가 변경될 때 업데이트
-  React.useEffect(() => {
-    clonedScene.traverse((child) => {
-      if (child.isMesh && child.material.uniforms?.u_color) {
-        child.material.uniforms.u_color.value = new THREE.Vector3(
-          hue[0] / 255,
-          hue[1] / 255,
-          hue[2] / 255
-        );
-      }
-    });
-  }, [hue, clonedScene, camera]);
+    return scene;
+  }, [gltf.scene, camera, colorVector]);
 
   useFrame(({ clock }) => {
     clonedScene.traverse((child) => {
-      if (child.isMesh && child.material.uniforms?.u_time) {
+      if (child.isMesh && child.material.uniforms) {
         child.material.uniforms.u_time.value = clock.getElapsedTime();
         child.material.uniforms.u_cameraPosition.value.copy(camera.position);
       }
@@ -72,26 +50,23 @@ function Star({ path, hue }) {
   return <primitive object={clonedScene} />;
 }
 
-// 마법봉 스틱 부분 렌더
 function Stick() {
   const gltf = useGLTF("/stick.glb");
   const stickClone = React.useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   return <primitive object={stickClone} />;
 }
 
-// 마법봉 렌더링 컴포넌트
-export default function Wand(props) {
-  const path = models[props.modelIndex] || "/star.glb";
-  const hue = props.hue;
-
+export default function Wand({ modelIndex = 0, hue = [255, 255, 255] }) {
+  const path = models[modelIndex] || models[0];
+  
   return (
-    <>
-      <group position={[0, 3, 0]}>
+    <group>
+      <group position={[0, 3, 0]} scale={[1, 1, 1]}>
         <Star path={path} hue={hue} />
       </group>
-      <group position={[0, -2, 0]}>
+      <group position={[0, -2, 0]} rotation={[0, 0, 0]} scale={[1, 1, 1]}>
         <Stick />
       </group>
-    </>
+    </group>
   );
 }

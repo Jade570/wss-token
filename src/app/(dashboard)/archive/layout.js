@@ -13,8 +13,6 @@ function LayoutWrapper({ children }) {
   const params = useParams();
   const { color } = params || {};
   const [lastColor, setLastColor] = useState([255, 255, 255]);
-  const hue = color && colors[color] ? colors[color] : lastColor;
-
   const pathname = usePathname();
   const router = useRouter();
   const [toggle, setToggle] = useState(false);
@@ -22,34 +20,37 @@ function LayoutWrapper({ children }) {
   const [players, setPlayers] = useState({});
   const [myModel, setMyModel] = useState(0);
 
-  // 소켓 플레이어 데이터 업데이트
+  // Get current color's RGB values
+  const currentHue = color && colors[color] ? colors[color] : lastColor;
+
+  // Socket player data update
   useEffect(() => {
-    if (socket && socket.id && !(color && colors[color])) {
+    if (socket && socket.id) {
       socket.emit("getPlayers");
       const handlePlayers = (data) => {
         setPlayers(data);
-        if (data[socket.id]?.color && colors[data[socket.id].color]) {
-          setLastColor(colors[data[socket.id].color]);
-        }
-        if (data[socket.id]?.model !== undefined) {
-          setMyModel(data[socket.id].model);
+        if (data[socket.id]) {
+          if (data[socket.id].color && colors[data[socket.id].color]) {
+            setLastColor(colors[data[socket.id].color]);
+          }
+          if (data[socket.id].model !== undefined) {
+            setMyModel(data[socket.id].model);
+          }
         }
       };
       socket.on("players", handlePlayers);
       return () => socket.off("players", handlePlayers);
     }
-  }, [socket, color]);
+  }, [socket]);
 
-  // 색상 변경 핸들러
+  // Color change handler
   const handleColorClick = (key) => {
-    const newColor = colors[key];
-    setLastColor(newColor);
     if (socket?.id) {
       socket.emit("colorUpdate", { id: socket.id, color: key });
     }
   };
 
-  // 토글 핸들러
+  // Toggle handler
   const handleToggle = () => {
     setToggle(prev => {
       const next = !prev;
@@ -94,7 +95,7 @@ function LayoutWrapper({ children }) {
         }}
         cameraProps={{ position: [0, 0, 25], fov: 45 }}
         modelIndex={myModel}
-        hue={lastColor}
+        hue={currentHue}
         useOrbit={true}
       />
 
