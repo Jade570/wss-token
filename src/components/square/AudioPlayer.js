@@ -31,27 +31,50 @@ function getChordFrequencies(chordElement) {
   return [];
 }
 
-export default function AudioPlayer({ socket, player, className }) {
+export default function AudioPlayer({ socket, player, className, players }) {
   const [audioContext, setAudioContext] = useState(null);
   const [gainNode, setGainNode] = useState(null);
-  const [oscillators, setOscillators] = useState([]);
-  const [isChordPlaying, setIsChordPlaying] = useState(false);
-  const [currentProgression, setCurrentProgression] = useState("marching_orig");
-  const [currentChordIndex, setCurrentChordIndex] = useState(0);
   const [volume, setVolume] = useState(0.1);
-  const [isAmbientPlaying, setIsAmbientPlaying] = useState(false);
   const ambientAudioRef = useRef(null);
+  const volumeRef = useRef(volume);
+  const currentChordIndexRef = useRef(0);
+  const bandpassFiltersRef = useRef([]);
+  const sourceNodeRef = useRef(null);
 
-  // 오디오 컨텍스트 초기화
+  // Keep volume ref in sync
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
+  // Initialize audio context and nodes
   useEffect(() => {
     if (typeof window !== "undefined") {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Resume context (required for browsers)
+      const resumeContext = async () => {
+        if (ctx.state === 'suspended') {
+          await ctx.resume();
+        }
+      };
+      resumeContext();
+
       const gain = ctx.createGain();
+      const filters = Array(4).fill().map(() => {
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 440;
+        filter.Q.value = 0;
+        filter.connect(gain); // Connect each filter directly to gain
+        return filter;
+      });
+      
       gain.connect(ctx.destination);
-      gain.gain.value = volume;
+      gain.gain.value = volumeRef.current;
       
       setAudioContext(ctx);
       setGainNode(gain);
+      bandpassFiltersRef.current = filters;
       
       return () => {
         ctx.close();
@@ -59,7 +82,19 @@ export default function AudioPlayer({ socket, player, className }) {
     }
   }, []);
 
-  // 볼륨 변경 핸들러
+  // Update Q values based on number of players
+  useEffect(() => {
+    if (!bandpassFiltersRef.current.length || !players) return;
+    
+    const activeWands = Object.values(players).filter(p => p.entered === 1).length;
+    const qValue = activeWands * 0.5; // Make the resonance gentler
+    
+    bandpassFiltersRef.current.forEach(filter => {
+      if (filter) filter.Q.value = qValue;
+    });
+  }, [players]);
+
+  // Volume change handler
   const handleVolumeChange = useCallback((event) => {
     const newVolume = parseFloat(event.target.value);
     setVolume(newVolume);
@@ -71,142 +106,83 @@ export default function AudioPlayer({ socket, player, className }) {
     }
   }, [gainNode]);
 
-  // 오실레이터 정리
-  const cleanupOscillators = useCallback(() => {
-    oscillators.forEach(osc => {
-      osc.stop();
-      osc.disconnect();
-    });
-    setOscillators([]);
-  }, [oscillators]);
-
-  // 코드 재생
-  const playChord = useCallback((frequencies) => {
-    if (!audioContext || !gainNode) return;
-    
-    cleanupOscillators();
-    
-    const newOscillators = frequencies.map(freq => {
-      const osc = audioContext.createOscillator();
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      osc.connect(gainNode);
-      osc.start();
-      return osc;
-    });
-    
-    setOscillators(newOscillators);
-  }, [audioContext, gainNode, cleanupOscillators]);
-
-  // 코드 진행 재생
+  // Update filter frequencies based on chord progression
   useEffect(() => {
-    if (!isChordPlaying) return;
+    const progression = chordProgression["marching_orig"];
+    if (!progression || !audioContext || !bandpassFiltersRef.current.length) return;
     
-    const progression = chordProgression[currentProgression];
-    if (!progression) return;
-    
-    const intervalId = setInterval(() => {
-      const chord = progression[currentChordIndex];
+    const updateFilterFrequencies = () => {
+      const chord = progression[currentChordIndexRef.current];
       const frequencies = getChordFrequencies(chord);
-      playChord(frequencies);
       
-      setCurrentChordIndex((prevIndex) => 
-        (prevIndex + 1) % progression.length
-      );
-    }, 1000);
+      // Update each filter's frequency
+      frequencies.forEach((freq, index) => {
+        const filterIndex = index % bandpassFiltersRef.current.length;
+        if (bandpassFiltersRef.current[filterIndex]) {
+          bandpassFiltersRef.current[filterIndex].frequency.value = freq;
+        }
+      });
+      
+      currentChordIndexRef.current = (currentChordIndexRef.current + 1) % progression.length;
+    };
+
+    const intervalId = setInterval(updateFilterFrequencies, 1000);
+    updateFilterFrequencies(); // Update frequencies immediately
     
-    return () => {
-      clearInterval(intervalId);
-      cleanupOscillators();
-    };
-  }, [isChordPlaying, currentProgression, currentChordIndex, playChord, cleanupOscillators]);
+    return () => clearInterval(intervalId);
+  }, [audioContext]);
 
-  // 소켓 이벤트 핸들링
+  // Play and process ambient sound
   useEffect(() => {
-    if (!socket) return;
+    if (!player?.color || !soundPaths[player.color] || !audioContext || !bandpassFiltersRef.current.length) return;
 
-    const handleProgressionChange = (data) => {
-      setCurrentProgression(data.progression);
-      setCurrentChordIndex(0);
-    };
-
-    socket.on("progressionChange", handleProgressionChange);
-    return () => socket.off("progressionChange", handleProgressionChange);
-  }, [socket]);
-
-  // 앰비언트 사운드 재생
-  const toggleAmbientSound = useCallback(() => {
-    if (!player?.color || !soundPaths[player.color]) return;
-
-    if (isAmbientPlaying) {
-      if (ambientAudioRef.current) {
-        ambientAudioRef.current.pause();
-        ambientAudioRef.current = null;
-      }
-    } else {
-      const audio = new Audio(soundPaths[player.color][0]);
-      audio.loop = true;
-      audio.volume = volume;
-      audio.play();
-      ambientAudioRef.current = audio;
+    // Resume context if suspended
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
     }
-    
-    setIsAmbientPlaying(!isAmbientPlaying);
-  }, [player?.color, isAmbientPlaying, volume]);
 
-  // 컴포넌트 언마운트 시 정리
-  useEffect(() => {
+    const audio = new Audio(soundPaths[player.color][0]);
+    audio.loop = true;
+    
+    // Create media element source
+    const source = audioContext.createMediaElementSource(audio);
+    sourceNodeRef.current = source;
+    
+    // Split audio to all filters in parallel
+    bandpassFiltersRef.current.forEach(filter => {
+      source.connect(filter);
+    });
+    
+    audio.volume = volumeRef.current;
+    audio.play().catch(error => {
+      console.log("Audio playback error:", error);
+    });
+    
+    ambientAudioRef.current = audio;
+    
     return () => {
       if (ambientAudioRef.current) {
         ambientAudioRef.current.pause();
+        if (sourceNodeRef.current) {
+          sourceNodeRef.current.disconnect();
+        }
         ambientAudioRef.current = null;
       }
-      cleanupOscillators();
     };
-  }, [cleanupOscillators]);
+  }, [player?.color, audioContext]);
 
   return (
-    <div className={className} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <div style={{ display: "flex", gap: "10px" }}>
-        <button
-          onClick={() => setIsChordPlaying(!isChordPlaying)}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: isChordPlaying ? "#666" : "#444",
-            color: "#fff",
-            border: "solid #888 2px",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          {isChordPlaying ? "Stop Chord" : "Play Chord"}
-        </button>
-        <button
-          onClick={toggleAmbientSound}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: isAmbientPlaying ? "#666" : "#444",
-            color: "#fff",
-            border: "solid #888 2px",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          {isAmbientPlaying ? "Stop Ambient" : "Play Ambient"}
-        </button>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <label style={{ color: "#fff" }}>Volume:</label>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onChange={handleVolumeChange}
-          style={{ width: "100px" }}
-        />
-      </div>
+    <div className={className} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <label style={{ color: "#fff" }}>Volume:</label>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={volume}
+        onChange={handleVolumeChange}
+        style={{ width: "100px" }}
+      />
     </div>
   );
 }

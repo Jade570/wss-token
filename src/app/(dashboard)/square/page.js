@@ -63,6 +63,7 @@ export default function Square() {
         <AudioPlayer
           socket={socket}
           player={players[myId]}
+          players={players}
           className={styles.audioPlayerContainer}
         />
       )}

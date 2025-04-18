@@ -33,47 +33,54 @@ export default function TragediesPage() {
       <h3 className={styles.pageSubtitle}>우울은 어디에서 와서 어디로 가는걸까?</h3>
 
       <h2 className={styles.sectionTitle}>WELCOME</h2>
-      <p className={styles.markdownParagraph}>
+      <div className={styles.markdownParagraph}>
         Welcome to my private space of tender and shy thoughts - where sorrows,
         cherished memories, and hopes intertwine. Explore the reflections tied
-        to each color and discover your own magical hue. By clicking on the toggle{" "}
-        <div style={{ position: "relative", display: "inline-block", marginTop: "-0.2em" }}>
-          <div
+        to each color and discover your own magical hue. By clicking on the toggle
+        <span style={{ position: "relative", display: "inline-block", marginTop: "-0.2em" }}>
+          <span
             style={{
               width: "2.75em",
               height: "1.5em",
               backgroundColor: "#fff",
               border: "1px solid #333",
               borderRadius: "0.75em",
+              display: "inline-block",
+              verticalAlign: "middle",
+              marginLeft: "0.5em",
+              marginRight: "0.5em",
+              position: "relative"
             }}
           />
-          <div
+          <span
             style={{
               position: "absolute",
-              left: "0.2em",
+              left: "0.7em",
               top: "0.2em",
               backgroundColor: "#333",
               width: "1.2em",
               height: "1.2em",
               borderRadius: "50%",
+              display: "inline-block"
             }}
           />
-          <div
+          <span
             style={{
               position: "absolute",
-              left: "1.45em",
+              left: "1.95em",
               top: "0.18em",
               backgroundImage: `url("/archive_dark.png")`,
               backgroundSize: "cover",
               width: "1em",
               height: "1em",
               borderRadius: "50%",
+              display: "inline-block"
             }}
           />
-        </div>{" "}
+        </span>
         on the bottom left, you can step into the enchanted square or return to
         this personal haven to read more.
-      </p>
+      </div>
 
       <hr className={styles.divider} />
       <h2 className={styles.sectionTitle}>Magical Girls Metaphor</h2>
