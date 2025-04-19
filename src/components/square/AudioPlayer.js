@@ -209,7 +209,7 @@ export default function AudioPlayer({ socket, player, className, players }) {
         style={{ width: "100px" }}
       />
       {!audioEnabled && (
-        <span style={{ color: "#fff", fontSize: "0.8em", marginLeft: "10px" }}>
+        <span style={{ color: "#fff", fontSize: "0.8em", marginLeft: "10px", width: "200px" }}>
           Tap screen to enable audio
         </span>
       )}
