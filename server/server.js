@@ -8,7 +8,7 @@ class Player {
   constructor(id) {
     this.id = id;
     this.model = 0;
-    this.color = "queer"; // 색상 key 값으로 저장
+    this.color = "red"; // Changed from "queer" to use basic color name
     this.entered = 0;
     this.entity = null;
 

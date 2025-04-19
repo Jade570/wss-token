@@ -7,12 +7,12 @@ import noteToFrequency from "./audio/webAudioFunc";
 
 // 색상별 사운드 파일 매핑
 const soundPaths = {
-  queer: ["/sounds/red/soojeong_103.mp3"],
-  stellar: ["/sounds/orange/me_ktx_to_seoul.mp3"],
-  sewol: ["/sounds/yellow/eunji_study.mp3"],
-  osong: ["/sounds/green/jiwon_eulsukdo.mp3"],
-  aricell: ["/sounds/blue/20240214-creative-response4.mp3"],
-  itaewon: ["/sounds/violet/minseo_yongsanstation.mp3"]
+  red: ["/sounds/red/soojeong_103.mp3"],
+  orange: ["/sounds/orange/me_ktx_to_seoul.mp3"],
+  yellow: ["/sounds/yellow/eunji_study.mp3"],
+  green: ["/sounds/green/jiwon_eulsukdo.mp3"],
+  blue: ["/sounds/blue/20240214-creative-response4.mp3"],
+  violet: ["/sounds/violet/minseo_yongsanstation.mp3"]
 };
 
 // 코드 요소를 주파수로 변환하는 함수
@@ -35,29 +35,20 @@ export default function AudioPlayer({ socket, player, className, players }) {
   const [audioContext, setAudioContext] = useState(null);
   const [gainNode, setGainNode] = useState(null);
   const [volume, setVolume] = useState(0.1);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const ambientAudioRef = useRef(null);
   const volumeRef = useRef(volume);
   const currentChordIndexRef = useRef(0);
   const bandpassFiltersRef = useRef([]);
   const sourceNodeRef = useRef(null);
 
-  // Keep volume ref in sync
-  useEffect(() => {
-    volumeRef.current = volume;
-  }, [volume]);
+  // Initialize audio on first user interaction
+  const initializeAudio = useCallback(async () => {
+    if (audioContext) return;
 
-  // Initialize audio context and nodes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
+    try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      
-      // Resume context (required for browsers)
-      const resumeContext = async () => {
-        if (ctx.state === 'suspended') {
-          await ctx.resume();
-        }
-      };
-      resumeContext();
+      await ctx.resume();
 
       const gain = ctx.createGain();
       const filters = Array(4).fill().map(() => {
@@ -65,7 +56,7 @@ export default function AudioPlayer({ socket, player, className, players }) {
         filter.type = 'bandpass';
         filter.frequency.value = 440;
         filter.Q.value = 0;
-        filter.connect(gain); // Connect each filter directly to gain
+        filter.connect(gain);
         return filter;
       });
       
@@ -75,19 +66,41 @@ export default function AudioPlayer({ socket, player, className, players }) {
       setAudioContext(ctx);
       setGainNode(gain);
       bandpassFiltersRef.current = filters;
-      
-      return () => {
-        ctx.close();
-      };
+      setAudioEnabled(true);
+    } catch (error) {
+      console.error("Failed to initialize audio:", error);
     }
-  }, []);
+  }, [audioContext]);
+
+  // Add touch/click listener for mobile
+  useEffect(() => {
+    const handleInteraction = async () => {
+      await initializeAudio();
+      // Remove listener after first interaction
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('click', handleInteraction);
+    };
+
+    document.addEventListener('touchstart', handleInteraction);
+    document.addEventListener('click', handleInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleInteraction);
+      document.removeEventListener('click', handleInteraction);
+    };
+  }, [initializeAudio]);
+
+  // Keep volume ref in sync
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
 
   // Update Q values based on number of players
   useEffect(() => {
     if (!bandpassFiltersRef.current.length || !players) return;
     
     const activeWands = Object.values(players).filter(p => p.entered === 1).length;
-    const qValue = activeWands * 0.5; // Make the resonance gentler
+    const qValue = activeWands * 0.5;
     
     bandpassFiltersRef.current.forEach(filter => {
       if (filter) filter.Q.value = qValue;
@@ -108,14 +121,15 @@ export default function AudioPlayer({ socket, player, className, players }) {
 
   // Update filter frequencies based on chord progression
   useEffect(() => {
+    if (!audioEnabled || !audioContext || !bandpassFiltersRef.current.length) return;
+    
     const progression = chordProgression["marching_orig"];
-    if (!progression || !audioContext || !bandpassFiltersRef.current.length) return;
+    if (!progression) return;
     
     const updateFilterFrequencies = () => {
       const chord = progression[currentChordIndexRef.current];
       const frequencies = getChordFrequencies(chord);
       
-      // Update each filter's frequency
       frequencies.forEach((freq, index) => {
         const filterIndex = index % bandpassFiltersRef.current.length;
         if (bandpassFiltersRef.current[filterIndex]) {
@@ -126,39 +140,50 @@ export default function AudioPlayer({ socket, player, className, players }) {
       currentChordIndexRef.current = (currentChordIndexRef.current + 1) % progression.length;
     };
 
-    const intervalId = setInterval(updateFilterFrequencies, 2000); // Changed from 1000ms to 2000ms
-    updateFilterFrequencies(); // Update frequencies immediately
+    const intervalId = setInterval(updateFilterFrequencies, 2000);
+    updateFilterFrequencies();
     
     return () => clearInterval(intervalId);
-  }, [audioContext]);
+  }, [audioContext, audioEnabled]);
 
   // Play and process ambient sound
   useEffect(() => {
-    if (!player?.color || !soundPaths[player.color] || !audioContext || !bandpassFiltersRef.current.length) return;
+    // Check if player has a valid color that exists in soundPaths
+    if (!audioEnabled || !player?.color || !soundPaths[player.color] || !audioContext || !bandpassFiltersRef.current.length) return;
+    
+    // Double check that the color is actually one of our valid colors
+    const validColors = Object.keys(soundPaths);
+    if (!validColors.includes(player.color)) return;
 
-    // Resume context if suspended
-    if (audioContext.state === 'suspended') {
-      audioContext.resume();
-    }
+    const setupAudio = async () => {
+      try {
+        // Resume context if suspended
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
 
-    const audio = new Audio(soundPaths[player.color][0]);
-    audio.loop = true;
-    
-    // Create media element source
-    const source = audioContext.createMediaElementSource(audio);
-    sourceNodeRef.current = source;
-    
-    // Split audio to all filters in parallel
-    bandpassFiltersRef.current.forEach(filter => {
-      source.connect(filter);
-    });
-    
-    audio.volume = volumeRef.current;
-    audio.play().catch(error => {
-      console.log("Audio playback error:", error);
-    });
-    
-    ambientAudioRef.current = audio;
+        const audio = new Audio(soundPaths[player.color][0]);
+        audio.loop = true;
+        
+        const source = audioContext.createMediaElementSource(audio);
+        sourceNodeRef.current = source;
+        
+        bandpassFiltersRef.current.forEach(filter => {
+          source.connect(filter);
+        });
+        
+        audio.volume = volumeRef.current;
+        await audio.play();
+        
+        ambientAudioRef.current = audio;
+      } catch (error) {
+        console.error("Audio playback error:", error);
+        // Retry after a user interaction
+        setAudioEnabled(false);
+      }
+    };
+
+    setupAudio();
     
     return () => {
       if (ambientAudioRef.current) {
@@ -169,7 +194,7 @@ export default function AudioPlayer({ socket, player, className, players }) {
         ambientAudioRef.current = null;
       }
     };
-  }, [player?.color, audioContext]);
+  }, [player?.color, audioContext, audioEnabled]);
 
   return (
     <div className={className} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -183,6 +208,11 @@ export default function AudioPlayer({ socket, player, className, players }) {
         onChange={handleVolumeChange}
         style={{ width: "100px" }}
       />
+      {!audioEnabled && (
+        <span style={{ color: "#fff", fontSize: "0.8em", marginLeft: "10px" }}>
+          Tap screen to enable audio
+        </span>
+      )}
     </div>
   );
 }
