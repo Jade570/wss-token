@@ -21,7 +21,7 @@ export default function RestrictedPage() {
       // Wait for connection and new socket.id
       socket.on('connect', () => {
         setIsGenerating(false);
-        router.push('/archive');
+        router.push('/initToken'); // Changed from /archive to /initToken
       });
     }
   };
