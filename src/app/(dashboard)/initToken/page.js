@@ -64,7 +64,7 @@ export default function InitToken() {
 
       <button
         className={styles.enterButton}
-        onClick={() => router.push('/archive')}
+        onClick={() => router.push('/')}
       >
         Enter magical space
       </button>

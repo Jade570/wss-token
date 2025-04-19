@@ -5,7 +5,7 @@ import React from 'react';
 // 모드 전환을 위한 토글 버튼 컴포넌트 (아카이브 <-> 스퀘어)
 export default function ToggleButton({ isToggled, onToggle }) {
   return (
-    <div style={{ position: "fixed", bottom: "20px", left: "10px", zIndex: 1000 }}>
+    <div style={{ position: "fixed", bottom: "80px", left: "10px", zIndex: 1000 }}>
       <div
         className="vertical-switch"
         onClick={onToggle}

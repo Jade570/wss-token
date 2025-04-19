@@ -6,7 +6,6 @@ import colors from "../../../components/generalInfo";
 import WandCanvas from "@/components/wandCanvas";
 import { useSocket } from "@/components/socketContext";
 import ColorNavigation from "@/components/archive/ColorNavigation";
-import ToggleButton from "@/components/common/ToggleButton";
 
 // 아카이브 레이아웃
 function LayoutWrapper({ children }) {
@@ -15,7 +14,6 @@ function LayoutWrapper({ children }) {
   const [lastColor, setLastColor] = useState([255, 255, 255]);
   const pathname = usePathname();
   const router = useRouter();
-  const [toggle, setToggle] = useState(false);
   const socket = useSocket();
   const [players, setPlayers] = useState({});
   const [myModel, setMyModel] = useState(0);
@@ -50,27 +48,12 @@ function LayoutWrapper({ children }) {
     }
   };
 
-  // Toggle handler
-  const handleToggle = () => {
-    setToggle(prev => {
-      const next = !prev;
-      setTimeout(() => {
-        if (next) {
-          router.push("/square");
-        } else {
-          router.push(color ? `/archive/${color}` : "/archive");
-        }
-      }, 400);
-      return next;
-    });
-  };
-
   return (
     <div style={{ display: "flex", height: "100vh", backgroundColor: "#fff" }}>
       <ColorNavigation 
         colors={colors}
         pathname={pathname}
-        isToggled={toggle}
+        isToggled={false}
         handleColorClick={handleColorClick}
       />
       
@@ -78,7 +61,7 @@ function LayoutWrapper({ children }) {
         flex: 1, 
         overflow: "auto",
         transition: "opacity 0.4s",
-        opacity: toggle ? 0 : 1 
+        opacity: 1 
       }}>
         {children}
       </div>
@@ -98,8 +81,6 @@ function LayoutWrapper({ children }) {
         hue={currentHue}
         useOrbit={true}
       />
-
-      <ToggleButton isToggled={toggle} onToggle={handleToggle} />
     </div>
   );
 }

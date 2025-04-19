@@ -14,6 +14,8 @@ function LayoutWrapper({ children }) {
   const socket = useSocket();
   const isSquarePage = pathname === "/square";
   const isInitTokenPage = pathname === "/initToken";
+  const isArchivePage = pathname.startsWith("/archive");
+  const showNavigation = (isSquarePage || isArchivePage) && !isInitTokenPage;
 
   // Sync toggle state with current page
   useEffect(() => {
@@ -50,68 +52,42 @@ function LayoutWrapper({ children }) {
         backgroundColor: isSquarePage ? "#000" : `rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`,
       }}
     >
-      {/* Toggle button - hidden on initToken page */}
-      {!isInitTokenPage && (
-        <div style={{ position: "fixed", bottom: "20px", left: "10px", zIndex: 1000 }}>
-          <div
-            className="vertical-switch"
-            onClick={handleToggle}
+      {showNavigation && (
+        <>
+          <div style={{ position: "fixed", bottom: "80px", left: "10px", zIndex: 1000 }}>
+            <ToggleButton isToggled={toggle} onToggle={handleToggle} />
+          </div>
+          <button
+            onClick={() => router.push('/')}
             style={{
-              backgroundColor: toggle ? "#333" : "#fff",
-              transition: "background-color 0.4s",
+              position: "fixed",
+              bottom: "20px",
+              left: "10px",
+              zIndex: 1000,
               width: "35px",
-              height: "70px",
+              height: "35px",
+              backgroundColor: "#fff",
+              border: "none",
+              borderRadius: "50%",
               cursor: "pointer",
-              borderRadius: "20px",
-              position: "relative",
+              padding: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background-color 0.3s",
             }}
           >
-            <div className="circle circle-top" />
-            <div className="circle circle-bottom" />
-            <div
-              className={`knob ${toggle ? "active" : ""}`}
+            <img
+              src="/ribbon.png"
+              alt="Home"
               style={{
-                backgroundColor: toggle ? "#fff" : "#333",
-                transition: "transform 0.4s, background-color 0.4s",
-                position: "absolute",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                top: 0,
-                left: "50%",
-                transform: toggle
-                  ? "translate(-50%, 35px)"
-                  : "translate(-50%, 5px)",
+                width: "20px",
+                height: "20px",
+                objectFit: "contain"
               }}
             />
-          </div>
-          <style jsx>{`
-            .circle {
-              position: absolute;
-              width: 30px;
-              height: 30px;
-              border-radius: 50%;
-              background-size: cover;
-              background-position: center;
-              left: 50%;
-              transform: translateX(-50%);
-              opacity: 0;
-              transition: opacity 0.4s;
-            }
-            .circle-top {
-              top: 2.5px;
-              background-size: 80%;
-              background-repeat: no-repeat;
-              background-image: url("/magic.png");
-              opacity: ${toggle ? 1 : 0};
-            }
-            .circle-bottom {
-              bottom: 2.5px;
-              background-image: url("/archive_dark.png");
-              opacity: ${toggle ? 0 : 1};
-            }
-          `}</style>
-        </div>
+          </button>
+        </>
       )}
       <div style={{ width: "100%", height: "100%" }}>
         {children}
