@@ -22,7 +22,7 @@ export default function ColorNavigation({
           setSelectedModel(data[socket.id].model);
         }
       };
-      
+
       socket.emit("getPlayers");
       socket.on("players", handlePlayers);
       socket.on("modelUpdate", (data) => {
@@ -30,7 +30,7 @@ export default function ColorNavigation({
           setSelectedModel(data.model);
         }
       });
-      
+
       return () => {
         socket.off("players", handlePlayers);
         socket.off("modelUpdate");
@@ -42,7 +42,7 @@ export default function ColorNavigation({
   const handleLocalModelClick = (modelIndex) => {
     setSelectedModel(modelIndex);
     // This will update the UI immediately
-    const modelEvent = new CustomEvent('modelChange', { detail: modelIndex });
+    const modelEvent = new CustomEvent("modelChange", { detail: modelIndex });
     window.dispatchEvent(modelEvent);
     // Then notify the server
     handleModelClick(modelIndex);
@@ -55,8 +55,8 @@ export default function ColorNavigation({
         setSelectedModel(event.detail);
       }
     };
-    window.addEventListener('modelChange', handleModelUpdate);
-    return () => window.removeEventListener('modelChange', handleModelUpdate);
+    window.addEventListener("modelChange", handleModelUpdate);
+    return () => window.removeEventListener("modelChange", handleModelUpdate);
   }, []);
 
   return (
@@ -128,7 +128,7 @@ export default function ColorNavigation({
             height: selectedModel === 0 ? "35px" : "30px",
             marginTop: "10px",
             marginLeft: "auto",
-            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+            backgroundColor: selectedModel === 0 ? "#fff" : '#ccc',
             clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
             cursor: "pointer",
             transition: "all 0.4s ease",
@@ -136,7 +136,7 @@ export default function ColorNavigation({
             backgroundSize: "70%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
-            border: selectedModel === 0 ? "2px solid white" : "none",
+            border: "none",
           }}
         />
         {/* Star Button */}
@@ -146,7 +146,7 @@ export default function ColorNavigation({
             width: selectedModel === 1 ? "35px" : "30px",
             height: selectedModel === 1 ? "35px" : "30px",
             marginLeft: "auto",
-            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+            backgroundColor: selectedModel === 1 ? "#fff" : '#ccc',
             clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
             cursor: "pointer",
             transition: "all 0.4s ease",
@@ -154,7 +154,7 @@ export default function ColorNavigation({
             backgroundSize: "70%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
-            border: selectedModel === 1 ? "2px solid white" : "none",
+            border: "none",
           }}
         />
         {/* Heart Button */}
@@ -164,7 +164,7 @@ export default function ColorNavigation({
             width: selectedModel === 2 ? "35px" : "30px",
             height: selectedModel === 2 ? "35px" : "30px",
             marginLeft: "auto",
-            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+            backgroundColor: selectedModel === 2 ? "#fff" : '#ccc',
             clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
             cursor: "pointer",
             transition: "all 0.4s ease",
@@ -172,7 +172,7 @@ export default function ColorNavigation({
             backgroundSize: "70%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
-            border: selectedModel === 2 ? "2px solid white" : "none",
+            border: "none",
           }}
         />
       </div>
