@@ -1,15 +1,70 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import Color from 'color';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Color from "color";
 
-// 색상 내비게이션 사이드바 컴포넌트
-export default function ColorNavigation({ colors, pathname, isToggled, handleColorClick }) {
+export default function ColorNavigation({
+  colors,
+  pathname,
+  isToggled,
+  handleColorClick,
+  handleModelClick,
+  socket,
+}) {
+  const [selectedModel, setSelectedModel] = useState(0);
+
+  // Initialize selected model from server state
+  useEffect(() => {
+    if (socket?.id) {
+      const handlePlayers = (data) => {
+        if (data[socket.id]?.model !== undefined) {
+          setSelectedModel(data[socket.id].model);
+        }
+      };
+      
+      socket.emit("getPlayers");
+      socket.on("players", handlePlayers);
+      socket.on("modelUpdate", (data) => {
+        if (data.id === socket.id) {
+          setSelectedModel(data.model);
+        }
+      });
+      
+      return () => {
+        socket.off("players", handlePlayers);
+        socket.off("modelUpdate");
+      };
+    }
+  }, [socket]);
+
+  // Local model change handler that updates state first
+  const handleLocalModelClick = (modelIndex) => {
+    setSelectedModel(modelIndex);
+    // This will update the UI immediately
+    const modelEvent = new CustomEvent('modelChange', { detail: modelIndex });
+    window.dispatchEvent(modelEvent);
+    // Then notify the server
+    handleModelClick(modelIndex);
+  };
+
+  // Sync with server state
+  useEffect(() => {
+    const handleModelUpdate = (event) => {
+      if (event.detail !== undefined) {
+        setSelectedModel(event.detail);
+      }
+    };
+    window.addEventListener('modelChange', handleModelUpdate);
+    return () => window.removeEventListener('modelChange', handleModelUpdate);
+  }, []);
+
   return (
     <div
       style={{
-        width: isToggled ? "100vw" : "50px",
+        width: "50px",
+        height: "100vh",
+        overflow: "hidden",
         backgroundColor: isToggled ? "#fff" : "#333",
         transition: "width 0.4s, background-color 0.4s",
         position: "relative",
@@ -29,32 +84,14 @@ export default function ColorNavigation({ colors, pathname, isToggled, handleCol
           transition: "opacity 0.4s",
         }}
       >
-        {/* 흰색 홈 링크 */}
-        <Link key="home" href="/archive">
-          <div
-            style={{
-              width: pathname === "/archive" ? "35px" : "30px",
-              height: pathname === "/archive" ? "60px" : "50px",
-              marginLeft: "auto",
-              backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
-              borderTop: pathname === "/archive" ? "2px solid white" : "none",
-              borderLeft: pathname === "/archive" ? "2px solid white" : "none",
-              borderBottom: pathname === "/archive" ? "2px solid white" : "none",
-              borderRight: "none",
-              borderTopLeftRadius: "8px",
-              borderBottomLeftRadius: "8px",
-              cursor: "pointer",
-              transition: "all 0.4s ease",
-            }}
-          />
-        </Link>
-
         {/* 컬러 버튼들 */}
         {Object.keys(colors).map((key) => {
           const isSelected = pathname === `/archive/${key}`;
           const computedColor = isSelected
             ? `rgb(${colors[key][0]}, ${colors[key][1]}, ${colors[key][2]})`
-            : Color(`rgb(${colors[key][0]}, ${colors[key][1]}, ${colors[key][2]})`)
+            : Color(
+                `rgb(${colors[key][0]}, ${colors[key][1]}, ${colors[key][2]})`
+              )
                 .darken(0.35)
                 .desaturate(0.4)
                 .rgb()
@@ -82,6 +119,62 @@ export default function ColorNavigation({ colors, pathname, isToggled, handleCol
             </Link>
           );
         })}
+
+        {/* Planet Button */}
+        <div
+          onClick={() => handleLocalModelClick(0)}
+          style={{
+            width: selectedModel === 0 ? "35px" : "30px",
+            height: selectedModel === 0 ? "35px" : "30px",
+            marginTop: "10px",
+            marginLeft: "auto",
+            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
+            cursor: "pointer",
+            transition: "all 0.4s ease",
+            backgroundImage: "url('/planet_dark.png')",
+            backgroundSize: "70%",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "calc(100% - 2px) center",
+            border: selectedModel === 0 ? "2px solid white" : "none",
+          }}
+        />
+        {/* Star Button */}
+        <div
+          onClick={() => handleLocalModelClick(1)}
+          style={{
+            width: selectedModel === 1 ? "35px" : "30px",
+            height: selectedModel === 1 ? "35px" : "30px",
+            marginLeft: "auto",
+            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
+            cursor: "pointer",
+            transition: "all 0.4s ease",
+            backgroundImage: "url('/star_dark.png')",
+            backgroundSize: "70%",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "calc(100% - 2px) center",
+            border: selectedModel === 1 ? "2px solid white" : "none",
+          }}
+        />
+        {/* Heart Button */}
+        <div
+          onClick={() => handleLocalModelClick(2)}
+          style={{
+            width: selectedModel === 2 ? "35px" : "30px",
+            height: selectedModel === 2 ? "35px" : "30px",
+            marginLeft: "auto",
+            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
+            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
+            cursor: "pointer",
+            transition: "all 0.4s ease",
+            backgroundImage: "url('/heart_dark.png')",
+            backgroundSize: "70%",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "calc(100% - 2px) center",
+            border: selectedModel === 2 ? "2px solid white" : "none",
+          }}
+        />
       </div>
     </div>
   );

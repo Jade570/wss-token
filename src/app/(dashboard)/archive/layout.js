@@ -1,19 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import colors from "../../../components/generalInfo";
 import WandCanvas from "@/components/wandCanvas";
 import { useSocket } from "@/components/socketContext";
-import ColorNavigation from "@/components/archive/ColorNavigation";
 
 // 아카이브 레이아웃
 function LayoutWrapper({ children }) {
   const params = useParams();
   const { color } = params || {};
   const [lastColor, setLastColor] = useState([255, 255, 255]);
-  const pathname = usePathname();
-  const router = useRouter();
   const socket = useSocket();
   const [players, setPlayers] = useState({});
   const [myModel, setMyModel] = useState(0);
@@ -21,10 +18,21 @@ function LayoutWrapper({ children }) {
   // Get current color's RGB values
   const currentHue = color && colors[color] ? colors[color] : lastColor;
 
+  // Handle immediate model changes from ColorNavigation
+  useEffect(() => {
+    const handleModelChange = (event) => {
+      setMyModel(event.detail);
+    };
+
+    window.addEventListener('modelChange', handleModelChange);
+    return () => window.removeEventListener('modelChange', handleModelChange);
+  }, []);
+
   // Socket player data update
   useEffect(() => {
     if (socket && socket.id) {
       socket.emit("getPlayers");
+      
       const handlePlayers = (data) => {
         setPlayers(data);
         if (data[socket.id]) {
@@ -36,27 +44,33 @@ function LayoutWrapper({ children }) {
           }
         }
       };
+
+      const handleModelUpdate = (data) => {
+        if (data.id === socket.id) {
+          setMyModel(data.model);
+          // Also update the local players state to stay in sync
+          setPlayers(prev => ({
+            ...prev,
+            [socket.id]: {
+              ...(prev[socket.id] || {}),
+              model: data.model
+            }
+          }));
+        }
+      };
+
       socket.on("players", handlePlayers);
-      return () => socket.off("players", handlePlayers);
+      socket.on("modelUpdate", handleModelUpdate);
+      
+      return () => {
+        socket.off("players", handlePlayers);
+        socket.off("modelUpdate", handleModelUpdate);
+      };
     }
   }, [socket]);
 
-  // Color change handler
-  const handleColorClick = (key) => {
-    if (socket?.id) {
-      socket.emit("colorUpdate", { id: socket.id, color: key });
-    }
-  };
-
   return (
     <div style={{ display: "flex", height: "100vh", backgroundColor: "#fff" }}>
-      <ColorNavigation 
-        colors={colors}
-        pathname={pathname}
-        isToggled={false}
-        handleColorClick={handleColorClick}
-      />
-      
       <div style={{ 
         flex: 1, 
         overflow: "auto",
