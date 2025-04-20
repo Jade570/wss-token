@@ -47,11 +47,35 @@ export default function Square() {
       }
     };
 
+    const handleModelUpdate = (data) => {
+      setPlayers(prev => ({
+        ...prev,
+        [data.id]: {
+          ...(prev[data.id] || {}),
+          model: data.model
+        }
+      }));
+    };
+
+    const handleColorUpdate = (data) => {
+      setPlayers(prev => ({
+        ...prev,
+        [data.id]: {
+          ...(prev[data.id] || {}),
+          color: data.color
+        }
+      }));
+    };
+
     socket.emit("getPlayers");
     socket.on("players", handlePlayers);
+    socket.on("modelUpdate", handleModelUpdate);
+    socket.on("colorUpdate", handleColorUpdate);
     
     return () => {
       socket.off("players", handlePlayers);
+      socket.off("modelUpdate", handleModelUpdate);
+      socket.off("colorUpdate", handleColorUpdate);
     };
   }, [socket, myPosition]);
 
@@ -92,6 +116,7 @@ export default function Square() {
           <WandGroup
             key={player.id}
             player={player}
+            isCurrentPlayer={player.id === myId}
             pivotRef={(el) => {
               if (el) {
                 playerPivotRefs.current[player.id] = el;

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import Color from "color";
 
 export default function ColorNavigation({
@@ -12,17 +12,26 @@ export default function ColorNavigation({
   handleModelClick,
   socket,
 }) {
+  const router = useRouter();
+  const currentPathname = usePathname();
+  const [selectedColor, setSelectedColor] = useState('red');
   const [selectedModel, setSelectedModel] = useState(0);
+  const isArchivePage = currentPathname.startsWith('/archive');
 
-  // Initialize selected model from server state
+  // Initialize selected color and model from server state
   useEffect(() => {
     if (socket?.id) {
       const handlePlayers = (data) => {
-        if (data[socket.id]?.model !== undefined) {
-          setSelectedModel(data[socket.id].model);
+        if (data[socket.id]) {
+          if (data[socket.id].color) {
+            setSelectedColor(data[socket.id].color);
+          }
+          if (data[socket.id].model !== undefined) {
+            setSelectedModel(data[socket.id].model);
+          }
         }
       };
-
+      
       socket.emit("getPlayers");
       socket.on("players", handlePlayers);
       socket.on("modelUpdate", (data) => {
@@ -30,7 +39,7 @@ export default function ColorNavigation({
           setSelectedModel(data.model);
         }
       });
-
+      
       return () => {
         socket.off("players", handlePlayers);
         socket.off("modelUpdate");
@@ -38,26 +47,23 @@ export default function ColorNavigation({
     }
   }, [socket]);
 
-  // Local model change handler that updates state first
-  const handleLocalModelClick = (modelIndex) => {
-    setSelectedModel(modelIndex);
-    // This will update the UI immediately
-    const modelEvent = new CustomEvent("modelChange", { detail: modelIndex });
-    window.dispatchEvent(modelEvent);
-    // Then notify the server
-    handleModelClick(modelIndex);
+  // Local color change handler
+  const handleLocalColorClick = (key) => {
+    setSelectedColor(key);
+    handleColorClick(key);
+    // Only navigate to archive/[color] if we're in an archive page
+    if (isArchivePage) {
+      router.push(`/archive/${key}`);
+    }
   };
 
-  // Sync with server state
-  useEffect(() => {
-    const handleModelUpdate = (event) => {
-      if (event.detail !== undefined) {
-        setSelectedModel(event.detail);
-      }
-    };
-    window.addEventListener("modelChange", handleModelUpdate);
-    return () => window.removeEventListener("modelChange", handleModelUpdate);
-  }, []);
+  // Local model change handler
+  const handleLocalModelClick = (modelIndex) => {
+    setSelectedModel(modelIndex);
+    const modelEvent = new CustomEvent('modelChange', { detail: modelIndex });
+    window.dispatchEvent(modelEvent);
+    handleModelClick(modelIndex);
+  };
 
   return (
     <div
@@ -84,9 +90,9 @@ export default function ColorNavigation({
           transition: "opacity 0.4s",
         }}
       >
-        {/* 컬러 버튼들 */}
+        {/* Color buttons */}
         {Object.keys(colors).map((key) => {
-          const isSelected = pathname === `/archive/${key}`;
+          const isSelected = selectedColor === key;
           const computedColor = isSelected
             ? `rgb(${colors[key][0]}, ${colors[key][1]}, ${colors[key][2]})`
             : Color(
@@ -98,25 +104,24 @@ export default function ColorNavigation({
                 .string();
 
           return (
-            <Link key={key} href={`/archive/${key}`}>
-              <div
-                onClick={() => handleColorClick(key)}
-                style={{
-                  width: isSelected ? "35px" : "30px",
-                  height: isSelected ? "60px" : "50px",
-                  marginLeft: "auto",
-                  backgroundColor: computedColor,
-                  borderTop: isSelected ? "2px solid white" : "none",
-                  borderLeft: isSelected ? "2px solid white" : "none",
-                  borderBottom: isSelected ? "2px solid white" : "none",
-                  borderRight: "none",
-                  borderTopLeftRadius: "8px",
-                  borderBottomLeftRadius: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.4s ease",
-                }}
-              />
-            </Link>
+            <div
+              key={key}
+              onClick={() => handleLocalColorClick(key)}
+              style={{
+                width: isSelected ? "35px" : "30px",
+                height: isSelected ? "60px" : "50px",
+                marginLeft: "auto",
+                backgroundColor: computedColor,
+                borderTop: isSelected ? "2px solid white" : "none",
+                borderLeft: isSelected ? "2px solid white" : "none",
+                borderBottom: isSelected ? "2px solid white" : "none",
+                borderRight: "none",
+                borderTopLeftRadius: "8px",
+                borderBottomLeftRadius: "8px",
+                cursor: "pointer",
+                transition: "all 0.4s ease",
+              }}
+            />
           );
         })}
 
@@ -128,7 +133,7 @@ export default function ColorNavigation({
             height: selectedModel === 0 ? "35px" : "30px",
             marginTop: "10px",
             marginLeft: "auto",
-            backgroundColor: selectedModel === 0 ? "#fff" : '#ccc',
+            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
             clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
             cursor: "pointer",
             transition: "all 0.4s ease",
@@ -136,7 +141,7 @@ export default function ColorNavigation({
             backgroundSize: "70%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
-            border: "none",
+            border: selectedModel === 0 ? "2px solid white" : "none",
           }}
         />
         {/* Star Button */}
@@ -146,7 +151,7 @@ export default function ColorNavigation({
             width: selectedModel === 1 ? "35px" : "30px",
             height: selectedModel === 1 ? "35px" : "30px",
             marginLeft: "auto",
-            backgroundColor: selectedModel === 1 ? "#fff" : '#ccc',
+            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
             clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
             cursor: "pointer",
             transition: "all 0.4s ease",
@@ -154,7 +159,7 @@ export default function ColorNavigation({
             backgroundSize: "70%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
-            border: "none",
+            border: selectedModel === 1 ? "2px solid white" : "none",
           }}
         />
         {/* Heart Button */}
@@ -164,7 +169,7 @@ export default function ColorNavigation({
             width: selectedModel === 2 ? "35px" : "30px",
             height: selectedModel === 2 ? "35px" : "30px",
             marginLeft: "auto",
-            backgroundColor: selectedModel === 2 ? "#fff" : '#ccc',
+            backgroundColor: pathname === "/archive" ? "#fff" : "#ccc",
             clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%, 20% 50%)",
             cursor: "pointer",
             transition: "all 0.4s ease",
@@ -172,7 +177,7 @@ export default function ColorNavigation({
             backgroundSize: "70%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
-            border: "none",
+            border: selectedModel === 2 ? "2px solid white" : "none",
           }}
         />
       </div>

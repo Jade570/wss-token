@@ -58,7 +58,8 @@ io.sockets.on("connection", function (socket) {
     }
     players[data.id].updateModel(data.model);
     console.log(`Model updated for ${data.id}: ${data.model}`);
-    socket.broadcast.emit("players", players);
+    // Emit to all clients including sender
+    io.emit("modelUpdate", data);
   });
 
   socket.on("colorUpdate", function (data) {
@@ -68,7 +69,8 @@ io.sockets.on("connection", function (socket) {
     }
     players[data.id].updateColor(data.color);
     console.log(`Color updated for ${data.id}: ${data.color}`);
-    socket.broadcast.emit("players", players);
+    // Emit to all clients including sender
+    io.emit("colorUpdate", data);
   });
 
   socket.on("enteredUpdate", function (data) {
