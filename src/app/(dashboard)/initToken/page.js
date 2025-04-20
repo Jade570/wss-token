@@ -27,6 +27,13 @@ export default function InitToken() {
     }
   };
 
+  const handleEnterClick = () => {
+    if (socket?.id) {
+      socket.emit("modelUpdate", { id: socket.id, model: selectedModel });
+      router.push('/');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.modelSelectContainer}>
@@ -64,7 +71,7 @@ export default function InitToken() {
 
       <button
         className={styles.enterButton}
-        onClick={() => router.push('/')}
+        onClick={handleEnterClick}
       >
         Enter magical space
       </button>

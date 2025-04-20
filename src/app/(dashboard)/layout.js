@@ -75,17 +75,12 @@ function LayoutWrapper({ children }) {
               alignItems: "center",
               justifyContent: "center",
               transition: "background-color 0.3s",
+              backgroundImage: "url('/home.png')",
+              backgroundSize: "80%",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
             }}
           >
-            <img
-              src="/ribbon.png"
-              alt="Home"
-              style={{
-                width: "20px",
-                height: "20px",
-                objectFit: "contain"
-              }}
-            />
           </button>
         </>
       )}

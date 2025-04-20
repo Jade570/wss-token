@@ -1,4 +1,4 @@
-a {
+.link {
   color: inherit;
   text-decoration: none !important;
 }
@@ -19,6 +19,7 @@ a {
   padding: 80px;
   gap: 64px;
   font-family: var(--font-geist-sans);
+  background: #000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -66,7 +67,7 @@ a {
   gap: 16px;
 }
 
-.ctas a {
+.cta {
   appearance: none;
   border-radius: 128px;
   height: 48px;
@@ -86,13 +87,13 @@ a {
   font-weight: 500;
 }
 
-a.primary {
+.primary {
   background: var(--foreground);
   color: var(--background);
   gap: 8px;
 }
 
-a.secondary {
+.secondary {
   border-color: var(--gray-alpha-200);
   min-width: 180px;
 }
@@ -103,7 +104,7 @@ a.secondary {
   gap: 24px;
 }
 
-.footer a {
+.footer .link {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -115,17 +116,17 @@ a.secondary {
 
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
+  .primary:hover {
     background: var(--button-primary-hover);
     border-color: transparent;
   }
 
-  a.secondary:hover {
+  .secondary:hover {
     background: var(--button-secondary-hover);
     border-color: transparent;
   }
 
-  .footer a:hover {
+  .footer .link:hover {
     text-decoration: underline;
     text-underline-offset: 4px;
   }
@@ -149,13 +150,13 @@ a.secondary {
     flex-direction: column;
   }
 
-  .ctas a {
+  .cta {
     font-size: 14px;
     height: 40px;
     padding: 0 16px;
   }
 
-  a.secondary {
+  .secondary {
     min-width: auto;
   }
 
