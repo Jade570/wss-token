@@ -46,14 +46,15 @@ export default function InitToken() {
             <img
               src={iconPath}
               alt={`${type} wand`}
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              style={{ width: "100%", height: "100%", objectFit: "contain", zIndex:"100" }}
             />
           </button>
         ))}
       </div>
-
+        <div className={styles.explanation}>{`Create your initial wand to enter magical space.
+        You can change the shape later.`}</div>
       <Canvas
-        camera={{ position: [0, 0, 20], fov: 45 }}
+        camera={{ position: [0, 0, 20], fov: 55 }}
         style={{ background: "#000000" }}
       >
         <ambientLight intensity={0.5} />

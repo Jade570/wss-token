@@ -66,32 +66,16 @@ export default function Home() {
       }}>
         <h1 style={{ 
           fontFamily: '"Special Gothic Expanded One", sans-serif',
-          marginBottom: '20px'
+          marginBottom: '0px'
         }}>
-          Where Does Melancholy Come From, and Where Is It Heading?
+          Welcome to the Magical Space!
         </h1>
-        <h3 style={{ 
-          fontStyle: 'italic',
-          color: '#ccc',
-          marginBottom: '40px',
-          fontFamily: '"PT Serif", serif'
-        }}>
-          우울은 어디에서 와서 어디로 가는걸까?
-        </h3>
-
-        <h2 style={{ 
-          fontFamily: '"Special Gothic Expanded One", sans-serif',
-          color: '#fff',
-          marginBottom: '20px'
-        }}>
-          WELCOME
-        </h2>
         <p style={{ 
           fontFamily: '"PT Serif", serif',
           lineHeight: '1.5',
           color: '#ccc',
           textAlign: 'left',
-          textIndent: '1em',
+          textIndent: '0',
           marginBottom: '40px'
         }}>
           Welcome to my private space of tender and shy thoughts - where sorrows,
