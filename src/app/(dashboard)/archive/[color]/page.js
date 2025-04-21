@@ -57,6 +57,8 @@ export default function TragedyDetail() {
         display: "flex",
         flexDirection: "column",
         color: color === "yellow" ? "#000" : "#fff",
+        width: "100%",
+        position: "relative"
       }}
     >
       {/* 고정된 제목 영역 등 detail 페이지 내용 */}
@@ -64,6 +66,7 @@ export default function TragedyDetail() {
         style={{
           paddingTop: "20px",
           paddingLeft: "40px",
+          paddingRight: "40px",
           paddingBottom: "20px",
           flexShrink: 0,
         }}
@@ -103,7 +106,7 @@ export default function TragedyDetail() {
           fontFamily: '"PT Serif", serif',
           fontWeight: 400,
           fontStyle: "normal",
-          maxWidth: "800px",
+          maxWidth: "100%",
         }}
       >
         {/* 상세 내용 */}
@@ -117,7 +120,6 @@ export default function TragedyDetail() {
               fontWeight: "400",
               fontStyle: "normal",
               position: "absolute",
-              top: "calc(100% + 30px)",
               fontSize: "0.6em",
               left: 0,
               paddingBottom: "1em",

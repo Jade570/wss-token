@@ -71,14 +71,19 @@ export default function ColorNavigation({
         width: "50px",
         height: "100vh",
         overflow: "hidden",
-        backgroundColor: isToggled ? "#fff" : "#333",
-        transition: "width 0.4s, background-color 0.4s",
-        position: "relative",
+        backgroundColor: "transparent",
+        position: "fixed",
+        left: 0,
+        top: 0,
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-end",
         paddingTop: "10px",
         paddingBottom: "20px",
+        zIndex: 2,
+        isolation: "isolate",
+        transform: isToggled ? "translateX(calc(100vw - 50px))" : "translateX(0)",
+        transition: "transform 0.4s ease-in-out, background-color 0.4s"
       }}
     >
       <div
@@ -88,6 +93,7 @@ export default function ColorNavigation({
           gap: "8px",
           flexGrow: 1,
           transition: "opacity 0.4s",
+          isolation: "isolate", // Create new stacking context
         }}
       >
         {/* Color buttons */}
@@ -120,6 +126,8 @@ export default function ColorNavigation({
                 borderBottomLeftRadius: "8px",
                 cursor: "pointer",
                 transition: "all 0.4s ease",
+                position: "relative",
+                zIndex: 1000,
               }}
             />
           );
@@ -142,6 +150,8 @@ export default function ColorNavigation({
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
             border: "none",
+            position: "relative",
+            zIndex: 1000,
           }}
         />
         {/* Star Button */}
@@ -160,6 +170,8 @@ export default function ColorNavigation({
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
             border: "none",
+            position: "relative",
+            zIndex: 1000,
           }}
         />
         {/* Heart Button */}
@@ -178,6 +190,8 @@ export default function ColorNavigation({
             backgroundRepeat: "no-repeat",
             backgroundPosition: "calc(100% - 2px) center",
             border: "none",
+            position: "relative",
+            zIndex: 1000,
           }}
         />
       </div>

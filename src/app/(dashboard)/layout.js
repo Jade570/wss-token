@@ -82,36 +82,43 @@ function LayoutWrapper({ children }) {
         height: "100vh",
         overflow: "hidden",
         position: "relative",
-        backgroundColor: isSquarePage
-          ? "#000"
-          : `rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`,
+        backgroundColor: "#000",
         display: "flex",
       }}
     >
+      <div style={{ flex: 1, height: "100%", position: "relative" }}>{children}</div>
       {showNavigation && (
-        <div style={{width:"50px", height:"100%", zIndex: 1000}}>
+        <div 
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "50px",
+            height: "100vh",
+            zIndex: 2,
+          }}
+        >
           <ColorNavigation
             colors={colors}
             pathname={pathname}
-            isToggled={false}
+            isToggled={toggle}
             handleColorClick={handleColorClick}
             handleModelClick={handleModelClick}
-            socket={socket}  // Add socket prop here
+            socket={socket}
           />
           <div
             style={{
               position: "fixed",
               bottom: "80px",
               left: "10px",
-              zIndex: 1000,
+              zIndex: 2,
             }}
           >
             <ToggleButton isToggled={toggle} onToggle={handleToggle} />
             <HomeButton />
-          </div>         
+          </div>
         </div>
       )}
-      <div style={{ flex: 1, height: "100%" }}>{children}</div>
     </div>
   );
 }

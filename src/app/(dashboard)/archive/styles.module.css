@@ -38,13 +38,13 @@
 .pageContainer {
   padding: 40px;
   text-align: start;
-  background: #fff;
+  background: #ccc;
   font-family: "Special Gothic Expanded One", "sans-serif";
   font-weight: 400;
   font-style: normal;
   margin-block-end: 0px;
   max-width: 800px;
-  align: center;
+  margin: 0 auto; /* Replace align with proper centering */
 }
 
 .pageTitle {

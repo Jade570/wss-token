@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import colors from "../../../components/generalInfo";
 import WandCanvas from "@/components/wandCanvas";
 import { useSocket } from "@/components/socketContext";
+import { useToggle } from "@/components/toggleContext";
 
 // 아카이브 레이아웃
 function LayoutWrapper({ children }) {
@@ -14,6 +15,7 @@ function LayoutWrapper({ children }) {
   const socket = useSocket();
   const [players, setPlayers] = useState({});
   const [myModel, setMyModel] = useState(0);
+  const { toggle: isToggled } = useToggle();
 
   // Get current color's RGB values
   const currentHue = color && colors[color] ? colors[color] : lastColor;
@@ -70,14 +72,32 @@ function LayoutWrapper({ children }) {
   }, [socket]);
 
   return (
-    <div style={{ display: "flex", height: "100vh", backgroundColor: "#fff" }}>
+    <div style={{ 
+      display: "flex", 
+      height: "100vh", 
+      backgroundColor: "#333",
+      position: "relative",
+    }}>
       <div style={{ 
-        flex: 1, 
-        overflow: "auto",
-        transition: "opacity 0.4s",
-        opacity: 1 
+        flex: 1,
+        marginLeft: "50px", // Changed from paddingLeft to marginLeft
+        transition: "transform 0.4s ease-in-out, width 0.4s ease-in-out",
+        transform: isToggled ? "translateX(100%)" : "translateX(0)",
+        width: isToggled ? "0" : "calc(100% - 50px)", // Subtract navigation width
+        position: "relative",
+        overflow: "hidden"
       }}>
-        {children}
+        <div style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: "100%",
+          height: "100%",
+          transition: "opacity 0.4s ease-in-out",
+          opacity: isToggled ? 0 : 1,
+        }}>
+          {children}
+        </div>
       </div>
 
       <WandCanvas
@@ -89,6 +109,8 @@ function LayoutWrapper({ children }) {
           height: "30vh",
           zIndex: 100,
           background: "transparent",
+          opacity: isToggled ? 0 : 1,
+          transition: "opacity 0.4s ease-in-out",
         }}
         cameraProps={{ position: [0, 0, 25], fov: 45 }}
         modelIndex={myModel}
