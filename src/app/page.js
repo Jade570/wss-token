@@ -11,6 +11,7 @@ export default function Home() {
   const router = useRouter();
   const socket = useSocket();
   const [modelIndex, setModelIndex] = useState(0);
+  const [playerColor, setPlayerColor] = useState('red'); // Default color
   
   useEffect(() => {
     if (!socket) return;
@@ -22,12 +23,18 @@ export default function Home() {
     socket.on("playerData", (data) => {
       if (data.players[data.id]) {
         setModelIndex(data.players[data.id].model);
+        if (data.players[data.id].color) {
+          setPlayerColor(data.players[data.id].color);
+        }
       }
     });
 
     socket.on("players", (players) => {
       if (socket.id && players[socket.id]) {
         setModelIndex(players[socket.id].model);
+        if (players[socket.id].color) {
+          setPlayerColor(players[socket.id].color);
+        }
       }
     });
 
@@ -84,7 +91,7 @@ export default function Home() {
         </p>
 
         <button
-          onClick={() => router.push('/archive/red')}
+          onClick={() => router.push(`/archive/${playerColor}`)}
           style={{
             padding: '12px 24px',
             fontSize: '16px',
