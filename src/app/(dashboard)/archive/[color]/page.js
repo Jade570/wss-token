@@ -111,6 +111,23 @@ export default function TragedyDetail() {
       >
         {/* 상세 내용 */}
         <ReactMarkdown components={components}>{Data[color].text}</ReactMarkdown>
+        <hr style={{ marginBottom: "1.25em" }}></hr>
+        <h2
+          style={{
+            fontFamily: '"Special Gothic Expanded One", "sans-serif"',
+            fontWeight: "400",
+            fontStyle: "normal",
+            paddingBottom: "0px",
+            marginBlockStart: "0px",
+            marginBlockEnd: "0px",
+            textIndent: "0px",
+            paddingTop: "20px",
+          }}
+          id="tragedy-21c"
+        >
+          About Sound
+        </h2>
+        <ReactMarkdown components={components}>{Data[color].sound}</ReactMarkdown>
         <div style={{ position: "relative", marginTop: "20px" }}>
           <hr style={{ marginBottom: "1.25em" }}></hr>
           <div

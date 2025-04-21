@@ -106,7 +106,7 @@ export default function Home() {
             e.currentTarget.style.color = '#fff';
           }}
         >
-          Enter magical space
+          Enter!
         </button>
       </div>
     </div>

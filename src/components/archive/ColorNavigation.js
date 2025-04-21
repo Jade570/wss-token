@@ -78,7 +78,7 @@ export default function ColorNavigation({
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-end",
-        paddingTop: "10px",
+        paddingTop: "20px",
         paddingBottom: "20px",
         zIndex: 2,
         isolation: "isolate",

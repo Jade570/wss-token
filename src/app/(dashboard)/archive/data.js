@@ -6,6 +6,7 @@ const Data = {
     subtitle: "Living as a Protest",
     text: ``,
 
+    sound:"This sound was recorded by a friend who lives in the same apartment complex as I do in Korea. Right in front of the complex is the small elementary school that we both attended, so on weekdays, when you step outside, you can hear children running and playing mixed with the chirping of birds. There’s also a road just beyond it, so you hear all kinds of cars passing by, and at times even strange helicopter noises. I moved to this neighborhood in Cheonan one year after I was born, and until I went to university in Seoul, I never once left this area. My friend is the same. In other words, it’s a neighborhood holding about nineteen years of memories. Some are painful, some joyful, but surely there is something unchanging in that elementary school we went to and in the neighborhood where we’ve both lived almost our whole lives.",
     tragedy: {
       title: "Queer Existence",
       subtitle:
@@ -17,6 +18,7 @@ const Data = {
   orange: {
     code: "#FF8C00",
     meaning: "Healing",
+    sound:"This sound was recorded while I was riding the KTX to Seoul. When you board the KTX, you hear a strange, somewhat high-pitched hum—wooo—resonating through the train. That uncanny tone, coupled with the feeling of “I’m really heading to Seoul, I’m traveling somewhere,” both excites me and fills me with a certain anxiety. The KTX is incredibly fast and comfortable, yet this artificial tone cutting through the tense quiet of crowded public spaces in Korea seems to amplify that unease. Sometimes that sound brings a spoonful of excitement, other times it adds a spoonful of anxiety and sadness—of course, it all depends on my mood. Surely, on those first days when I took the KTX to Seoul for university, there was only that blissful ignorance, unable to share in the world’s sorrow.",
     tragedy: {
       title: "Stellar Daisy Sinking",
       subtitle:
@@ -28,6 +30,7 @@ const Data = {
   yellow: {
     code: "#FFED00",
     meaning: "Sunlight",
+    sound:"Being 25 years old, some of my friends have already found jobs or are preparing to enter the workforce, and others—like me—are attending or preparing for graduate school. A few are still undergraduates, and several more are studying for high‑stakes national certification exams, such as the civil service exam (고시). This is the sound a friend of mine—who’s preparing for one of those exams—recorded while studying in our university library. Most Korean universities provide reading rooms that are kept extremely quiet exclusively for students tackling these major exams, and my friend is using one right now. If the Danwon High School seniors who perished in the Sewol ferry disaster hadn’t been caught up in that tragedy, they too would probably have been enjoying this slightly strange, utterly silent space while studying for their futures.",
     tragedy: {
       title: "Sinking of MV Sewol",
       subtitle:
@@ -39,6 +42,7 @@ const Data = {
   green: {
     code: "#008024",
     meaning: "Nature",
+    sound:"I like staying at home, but one of my friends loves traveling. They have a keener sense for sound than I do and often record various noises. This is a recording they made at Eulsukdo. Because I lived in Korea all my life, I never thought any of the sounds around me were particularly special. But when I came here to Atlanta, I felt something was missing from the soundscape. One of those things seems to be the chorus of insects. Listening to this recording my friend gave me, it’s perhaps not surprising that the insect sounds—more than the birdsong or the recording itself—are what I miss most. Will we be able to carry these beautiful natural sounds of each place, and nature itself, with us until the very end?",
     tragedy: {
       title: "Osong Tunnel Flooding",
       subtitle:
@@ -50,6 +54,7 @@ const Data = {
   blue: {
     code: "#004CFF",
     meaning: "Harmony",
+    sound:"The Aricell accident always felt distant to me. It happened in a region with which I had no connection, and I thought the victims had nothing to do with me. But when one of my friends suggested that I must have felt a lot about this accident, I felt ashamed. What made this incident especially striking was that the victims were migrant workers—and it laid bare the shamefully poor human‑rights protections and labor laws for migrant workers in Korea. I am living abroad myself; how could I possibly alienate them? This is a sound I recorded here in Atlanta. In the first part you’ll hear birdsong, and in the second part the sound of the road blends in.",
     text: `Investigating the recent catastrophes in Korea, I observed that the representative colors of each disaster consist of five of the six colors of the pride rainbow. If the most recent disaster - [the Aricell battery factory fire](/archive/blue#tragedy-title) - has revealed the safety hazards that migrant workers, a group that is not well represented in Korea, must endure, then the hatred faced by the queer community in Korea also falls under a similar hazard. Furthermore, I am reminded of [Sergeant Byun Hui-su, a close friend of my friends, who was forcibly discharged after her gender transition.](https://www.dw.com/en/s-korea-court-says-dismissal-of-transgender-soldier-illegal/a-59434830) Here, in the final color, red, I wish to encapsulate both my story and Sergeant Byun Hui-su's story, to speak of the pain experienced by Koreans, and queer Koreans, living in these times, the most heartfelt wishes that bloom from that pain, and the love that is built on that foundation.`,
 
     tragedy: {
@@ -63,6 +68,7 @@ const Data = {
   violet: {
     code: "#732983",
     meaning: "Spirit",
+    sound:"This is a sound my high school friend—who grew up with me in Cheonan and now lives in Seoul—recorded at Yongsan Station in Seoul. For friends like us who came up from the countryside, there’s always a special thrill and sense of wonder about Seoul. Just stepping into the station makes your heart race. And stations are always crowded. Both Seoulites and people from the provinces spill out voices and sounds full of their dreams, their excitement, and every other emotion. Especially at Yongsan Station, the nearby department stores and shopping districts blast loud music. So if you sit there quietly, it feels chaotic, yet you realize, “This is where people live—this is our country’s biggest city.” That same evening in Itaewon, young people with those feelings had gathered—and the state literally let them die while turning its back on them...",
     tragedy: {
       title: "Itaewon Crowd Crush",
       subtitle:
