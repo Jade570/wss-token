@@ -13,8 +13,41 @@ export default function TragedyDetail() {
   const { color } = params || {};
   // color 값이 있으면 해당 색상을, 없으면 기본 흰색을 사용합니다.
   const hue = color && colors[color] ? colors[color] : [255, 255, 255];
+
+  // Helper function to check if a URL is external
+  const isExternalLink = (href) => {
+    if (!href) return false;
+    // Check if the href is a full URL (starts with http:// or https://) and not pointing to wss.chaeryeongoh.com
+    return (href.startsWith('http://') || href.startsWith('https://')) && !href.includes('wss.chaeryeongoh.com');
+  };
+
   const components = {
     a: ({ href, children }) => {
+      // Check if this is an external link
+      const external = isExternalLink(href);
+      
+      // If it's an external link, use a regular <a> tag with target="_blank"
+      if (external) {
+        return (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "#333",
+              textDecoration: "none",
+              transition: "color 0.3s",
+              borderLeft: "3px solid #8fd9a3",
+              paddingLeft: "5px",
+              backgroundColor: "rgb(228, 248, 232)",
+            }}
+          >
+            {children}
+          </a>
+        );
+      }
+
+      // For internal links, use Next.js Link component
       return (
         <Link legacyBehavior href={href}>
           <a
